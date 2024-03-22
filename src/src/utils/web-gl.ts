@@ -1,3 +1,5 @@
+import { Point } from '../classes/point.ts';
+
 export function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
   const displayWidth = canvas.clientWidth;
   const displayHeight = canvas.clientHeight;
@@ -42,4 +44,39 @@ export function createProgram(gl: WebGLRenderingContext, vertexShader: WebGLShad
   }
 
   gl.deleteProgram(program);
+}
+
+export function renderUtils(gl: WebGLRenderingContext, program: WebGLProgram, attribute: string, arr: Float32Array, size = 2, type = gl.FLOAT,
+                       isNormalized = false) {
+  const attributeLocation = gl.getAttribLocation(program, attribute);
+  const buffer = gl.createBuffer();
+
+  const stride = 0;
+  const offset = 0;
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, arr, gl.STATIC_DRAW);
+
+  gl.useProgram(program);
+  gl.enableVertexAttribArray(attributeLocation);
+  gl.vertexAttribPointer(
+    attributeLocation,
+    size,
+    type,
+    isNormalized,
+    stride,
+    offset
+  );
+}
+export function transformCoordinate(canvas: HTMLCanvasElement, x: number, y: number) {
+  const position = canvas.getBoundingClientRect();
+  const [width, height] = [position.width, position.height];
+
+  /* Converts from coordinate to zero to one */
+  /* converts zero to one to zero to two */
+  /* Converts zero to two to -1 to 1 */
+  const realWidth = (x / width) * 2 - 1;
+  const realHeight = (y / height) * -2 + 1;
+
+  return new Point(realWidth, realHeight);
 }

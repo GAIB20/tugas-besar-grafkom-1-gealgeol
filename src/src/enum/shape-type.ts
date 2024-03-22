@@ -1,4 +1,4 @@
-enum ShapeType {
+export enum ShapeType {
   LINE = "Line",
   SQUARE = "Square",
   RECTANGLE = "Rectangle",
