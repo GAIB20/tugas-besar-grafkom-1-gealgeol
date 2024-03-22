@@ -12,6 +12,6 @@ export const VertexShaderSource = `
 
     vec2 clipSpace = zeroToTwo - 1.0;
  
-    gl_Position = vec4(a_position, 0, 1);
+    gl_Position = vec4(clipSpace, 0, 1);
     v_color = a_color;
   }`;
