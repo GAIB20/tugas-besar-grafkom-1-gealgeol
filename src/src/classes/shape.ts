@@ -1,5 +1,5 @@
 import { Point } from './point.ts';
-import { renderUtils } from '../utils/web-gl.ts';
+import { bindBuffer } from '../utils/web-gl.ts';
 import { ShapeType } from '../enum/shape-type.ts';
 
 
@@ -13,6 +13,7 @@ export abstract class Shape {
     this.shapeType = shapeType;
     this.positions = [];
   }
+
   public getPositions() {
     let bufferPositions: number[] = [];
     this.positions.forEach((pos: Point) => bufferPositions.push(...pos.getCoordinate()));
@@ -28,11 +29,9 @@ export abstract class Shape {
 
   abstract getPrimitiveType(gl: WebGLRenderingContext): number
 
-  public render(gl: WebGLRenderingContext, program: WebGLProgram) {
-    renderUtils(gl, program, "a_position", this.getPositions(), 2, gl.FLOAT, false)
-    renderUtils(gl, program, "a_color", this.getColors(), 4, gl.FLOAT, false)
-    let resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
-    gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+  public render(gl: WebGLRenderingContext, bufferPos: WebGLBuffer, bufferColor: WebGLBuffer) {
+    bindBuffer(gl, this.getPositions(), bufferPos);
+    bindBuffer(gl, this.getColors(), bufferColor);
     const offset = 0;
     let count = this.positions.length;
     gl.drawArrays(this.getPrimitiveType(gl), offset, count);

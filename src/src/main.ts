@@ -1,4 +1,3 @@
-// @ts-nocheck
 import './style.css';
 import { VertexShaderSource } from './shaders/vertex-shader.ts';
 import { FragmentShaderSource } from './shaders/fragment-shader.ts';
@@ -7,47 +6,94 @@ import { Point } from './classes/point.ts';
 import { Line } from './classes/line.ts';
 import { Shape } from './classes/shape.ts';
 
-// Create WebGL program
-let canvas: HTMLCanvasElement | null = document.querySelector<HTMLCanvasElement>('#webgl-canvas');
-resizeCanvasToDisplaySize(<HTMLCanvasElement>canvas)
-let gl = canvas!.getContext('webgl');
+function main() {
+  // Create WebGL program
+  let canvas: HTMLCanvasElement | null = document.querySelector<HTMLCanvasElement>('#webgl-canvas');
 
-let vertexShader = createShader(gl, gl.VERTEX_SHADER, VertexShaderSource);
-let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, FragmentShaderSource);
-
-let program = createProgram(gl, vertexShader, fragmentShader);
-
-
-// Global variables
-let isDrawing = false;
-let objects: Shape[] = []
-canvas?.addEventListener("mousedown", (e) => {
-  const x = e.clientX
-  const y = e.clientY
-  const point = new Point(x, y)
-  console.log(x, y);
-  if (!isDrawing) {
-    const line = new Line(objects.length, point);
-    objects.push(line);
-
-    isDrawing = true;
-  } else {
-    const line = objects[objects.length-1] as Line;
-    line.setEndPoint(point);
-    line.render(gl, program)
-
-    isDrawing = false;
+  let gl = canvas!.getContext('webgl');
+  if (!gl) {
+    return;
   }
 
-})
+  let vertexShader = createShader(gl, gl.VERTEX_SHADER, VertexShaderSource);
+  let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, FragmentShaderSource);
 
-canvas?.addEventListener("mousemove", (e) => {
-  const x = e.clientX;
-  const y = e.clientY;
-  const point = new Point(x, y)
-  console.log(objects);
+  if (!vertexShader || !fragmentShader) {
+    return;
+  }
 
-  const line: Line = objects[objects.length-1] as Line;
-  line.setEndPoint(point);
-  line.render(gl, program);
-});
+  let program = createProgram(gl, vertexShader, fragmentShader);
+  if (!program) {
+    return;
+  }
+
+  resizeCanvasToDisplaySize(<HTMLCanvasElement>canvas);
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+  gl.clearColor(0, 0, 0, 0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  gl.useProgram(program);
+  const bufferPos = gl.createBuffer();
+  const bufferCol = gl.createBuffer();
+
+  const positionAttributeLocation = gl.getAttribLocation(program, 'a_position');
+
+  const stride = 0;
+  const offset = 0;
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufferPos);
+
+  gl.enableVertexAttribArray(positionAttributeLocation);
+  gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, stride, offset);
+
+  const colorAttributeLocation = gl.getAttribLocation(program, 'a_color');
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufferCol);
+  gl.enableVertexAttribArray(colorAttributeLocation);
+  gl.vertexAttribPointer(colorAttributeLocation, 4, gl.FLOAT, false, stride, offset);
+
+  if (!bufferCol || !bufferPos) {
+    return;
+  }
+
+  let resolutionUniformLocation = gl.getUniformLocation(program, 'u_resolution');
+  gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+
+  // GLOBALS
+  let isDrawing = false;
+  let objects: Shape[] = [];
+  canvas?.addEventListener('mousedown', (e) => {
+    const x = e.offsetX;
+    const y = e.offsetY;
+    const point = new Point(x, y);
+    console.log(x, y);
+    if (!isDrawing) {
+      const line = new Line(objects.length, point);
+      objects.push(line);
+
+      isDrawing = true;
+    } else {
+      const line = objects[objects.length - 1] as Line;
+      line.setEndPoint(point);
+      line.render(gl, bufferPos, bufferCol);
+
+      isDrawing = false;
+    }
+
+  });
+
+  canvas?.addEventListener('mousemove', (e) => {
+    if (isDrawing) {
+      const x = e.offsetX;
+      const y = e.offsetY;
+      const point = new Point(x, y);
+      console.log(objects);
+
+      const line: Line = objects[objects.length - 1] as Line;
+      line.setEndPoint(point);
+      line.render(gl, bufferPos, bufferCol);
+    }
+  });
+}
+
+main();
