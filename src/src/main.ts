@@ -75,6 +75,10 @@ function main() {
     window.requestAnimationFrame(renderCanvas);
   };
 
+  document.querySelector("#line-btn")?.addEventListener('click', () => {
+    activeShape = ShapeType.LINE;
+  })
+
   canvas?.addEventListener('mousedown', (e) => {
     const x = e.offsetX;
     const y = canvas.height - e.offsetY;
@@ -101,14 +105,17 @@ function main() {
 
   canvas?.addEventListener('mousemove', (e) => {
     if (isDrawing) {
-      const x = e.offsetX;
-      const y = canvas.height - e.offsetY;
-      const point = new Point(x, y);
-      console.log(objects);
+      switch (activeShape) {
+        case ShapeType.LINE:
+          const x = e.offsetX;
+          const y = canvas.height - e.offsetY;
+          const point = new Point(x, y);
+          console.log(objects);
 
-      const line: Line = objects[objects.length - 1] as Line;
-      line.setEndPoint(point);
-      line.render(gl, bufferPos, bufferCol);
+          const line: Line = objects[objects.length - 1] as Line;
+          line.setEndPoint(point);
+          line.render(gl, bufferPos, bufferCol);
+      }
     }
   });
 }

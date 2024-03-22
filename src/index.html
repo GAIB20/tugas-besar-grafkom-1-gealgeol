@@ -8,8 +8,14 @@
 </head>
 <body>
 <div id="app" class="h-screen w-screen flex">
-  <div class="flex flex-col h-full bg-blue-950 w-[300px] p-4">
-    <h1 class="text-2xl font-bold text-white">Tubes 1 Grafkom</h1>
+  <div class="flex flex-col h-full bg-blue-950 w-[300px] p-4 gap-4">
+    <h1 class="text-2xl font-bold text-white">GealGeol Drawer</h1>
+    <div class="grid grid-cols-2 text-white font-medium gap-2">
+      <button id="line-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Line</button>
+      <button id="square-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Square</button>
+      <button id="rectangle-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Rectangle</button>
+      <button id="polygon-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Polygon</button>
+    </div>
   </div>
   <div>
     <canvas id="webgl-canvas" class="w-full h-full"></canvas>
