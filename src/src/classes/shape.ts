@@ -8,7 +8,7 @@ export abstract class Shape {
   public shapeType: ShapeType;
   public positions: Point[];
 
-  public constructor(id: number, shapeType: ShapeType) {
+  protected constructor(id: number, shapeType: ShapeType) {
     this.id = id;
     this.shapeType = shapeType;
     this.positions = [];

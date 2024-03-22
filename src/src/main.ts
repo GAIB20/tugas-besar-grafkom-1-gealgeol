@@ -1,10 +1,11 @@
 import './style.css';
 import { VertexShaderSource } from './shaders/vertex-shader.ts';
 import { FragmentShaderSource } from './shaders/fragment-shader.ts';
-import { resizeCanvasToDisplaySize, createProgram, createShader } from './utils/web-gl.ts';
+import { createProgram, createShader, resizeCanvasToDisplaySize } from './utils/web-gl.ts';
 import { Point } from './classes/point.ts';
 import { Line } from './classes/line.ts';
 import { Shape } from './classes/shape.ts';
+import { ShapeType } from './enum/shape-type.ts';
 
 function main() {
   // Create WebGL program
@@ -62,22 +63,38 @@ function main() {
   // GLOBALS
   let isDrawing = false;
   let objects: Shape[] = [];
+  let activeShape: ShapeType = ShapeType.LINE;
+
+  const renderCanvas = () => {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    for (const object of objects) {
+      object.render(gl, bufferPos, bufferCol);
+    }
+
+    window.requestAnimationFrame(renderCanvas);
+  };
+
   canvas?.addEventListener('mousedown', (e) => {
     const x = e.offsetX;
-    const y = e.offsetY;
+    const y = canvas.height - e.offsetY;
     const point = new Point(x, y);
-    console.log(x, y);
-    if (!isDrawing) {
-      const line = new Line(objects.length, point);
-      objects.push(line);
 
-      isDrawing = true;
-    } else {
-      const line = objects[objects.length - 1] as Line;
-      line.setEndPoint(point);
-      line.render(gl, bufferPos, bufferCol);
+    switch (activeShape) {
+      case ShapeType.LINE:
+        if (!isDrawing) {
+          const line = new Line(objects.length, point);
+          objects.push(line);
 
-      isDrawing = false;
+          isDrawing = true;
+        } else {
+          const line = objects[objects.length - 1] as Line;
+          line.setEndPoint(point);
+          line.render(gl, bufferPos, bufferCol);
+          renderCanvas()
+
+          isDrawing = false;
+        }
     }
 
   });
@@ -85,7 +102,7 @@ function main() {
   canvas?.addEventListener('mousemove', (e) => {
     if (isDrawing) {
       const x = e.offsetX;
-      const y = e.offsetY;
+      const y = canvas.height - e.offsetY;
       const point = new Point(x, y);
       console.log(objects);
 
