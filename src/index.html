@@ -1,26 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vite + TS</title>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
 </head>
+
 <body>
-<div id="app" class="h-screen w-screen flex">
-  <div class="flex flex-col h-full bg-blue-950 w-[300px] p-4 gap-4">
-    <h1 class="text-2xl font-bold text-white">GealGeol Drawer</h1>
-    <div class="grid grid-cols-2 text-white font-medium gap-2">
-      <button id="line-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Line</button>
-      <button id="square-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Square</button>
-      <button id="rectangle-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Rectangle</button>
-      <button id="polygon-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Polygon</button>
+    <div id="app" class="h-screen w-screen flex">
+        <div class="flex flex-col h-full bg-blue-950 w-[300px] p-4 gap-4">
+            <h1 class="text-2xl font-bold text-white">GealGeol Drawer</h1>
+            <div class="grid grid-cols-2 text-white font-medium gap-2">
+                <button id="line-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Line</button>
+                <button id="square-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Square</button>
+                <button id="rectangle-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Rectangle</button>
+                <button id="polygon-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Polygon</button>
+            </div>
+            <div id="sidebar" class="text-medium font-medium text-white" style="display: none;">
+                <label for="slider-x">X Position: <span id="slider-x-value">0</span></label>
+                <input id="slider-x" type="range" min="0" max="canvas.width" step="1" value="0" />
+
+                <label for="slider-y">Y Position: <span id="slider-y-value">0</span></label>
+                <input id="slider-y" type="range" min="0" max="canvas.height" step="1" value="0" />
+
+                <label for="slider-length">Length: <span id="slider-length-value">100</span></label>
+                <input id="slider-length" type="range" min="0" max="200" step="1" value="100" />
+
+                <label for="slider-rotation">Rotation: <span id="slider-rotation-value">0</span>°</label>
+                <input id="slider-rotation" type="range" min="0" max="360" step="1" value="0" />
+
+                <label for="color-picker">Color:</label>
+                <input id="color-picker" type="color" />
+
+                <label for="shape-dropdown">Shape:</label>
+                <select id="shape-dropdown" class="text-black"></select>
+            </div>
+        </div>
+        <div>
+            <canvas id="webgl-canvas" class="w-full h-full"></canvas>
+        </div>
     </div>
-  </div>
-  <div>
-    <canvas id="webgl-canvas" class="w-full h-full"></canvas>
-  </div>
-</div>
-<script type="module" src="src/main.ts"></script>
+    <script type="module" src="src/main.ts"></script>
 </body>
+
 </html>
