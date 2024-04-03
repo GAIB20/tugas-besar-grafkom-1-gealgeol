@@ -23,4 +23,8 @@ export class Point {
   public getCoordinate() {
     return [this.x, this.y];
   }
+
+  public equals(point: Point) {
+    return this.x === point.x && this.y === point.y;
+  }
 }

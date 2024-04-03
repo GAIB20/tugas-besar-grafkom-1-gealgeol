@@ -6,15 +6,19 @@ import { Point } from './classes/point.ts';
 import { Line } from './classes/line.ts';
 import { Shape } from './classes/shape.ts';
 import { ShapeType } from './enum/shape-type.ts';
+import { Rectangle } from './classes/rectangle.ts';
+import { Polygon } from './classes/polygon.ts';
 
 function main() {
   // Create WebGL program
-  let canvas: HTMLCanvasElement | null = document.querySelector<HTMLCanvasElement>('#webgl-canvas');
+  let _canvas: HTMLCanvasElement | null = document.querySelector<HTMLCanvasElement>('#webgl-canvas');
+  const canvas = _canvas!!
 
-  let gl = canvas!.getContext('webgl');
-  if (!gl) {
+  let _gl = canvas.getContext('webgl');
+  if (!_gl) {
     return;
   }
+  const gl = _gl!!
 
   let vertexShader = createShader(gl, gl.VERTEX_SHADER, VertexShaderSource);
   let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, FragmentShaderSource);
@@ -79,7 +83,19 @@ function main() {
     activeShape = ShapeType.LINE;
   })
 
-  canvas?.addEventListener('mousedown', (e) => {
+  document.querySelector("#square-btn")?.addEventListener('click', () => {
+    activeShape = ShapeType.SQUARE;
+  })
+  
+  document.querySelector("#rectangle-btn")?.addEventListener('click', () => {
+    activeShape = ShapeType.RECTANGLE;
+  })
+
+  document.querySelector("#polygon-btn")?.addEventListener('click', () => {
+    activeShape = ShapeType.POLYGON;
+  })
+
+  canvas.addEventListener('mousedown', (e) => {
     const x = e.offsetX;
     const y = canvas.height - e.offsetY;
     const point = new Point(x, y);
@@ -88,33 +104,69 @@ function main() {
       case ShapeType.LINE:
         if (!isDrawing) {
           const line = new Line(objects.length, point);
-          objects.push(line);
-
+          objects.push(line); 
           isDrawing = true;
         } else {
           const line = objects[objects.length - 1] as Line;
           line.setEndPoint(point);
           line.render(gl, bufferPos, bufferCol);
           renderCanvas()
-
           isDrawing = false;
         }
+        break;
+      case ShapeType.RECTANGLE:
+        if (!isDrawing) {
+          const rectangle = new Rectangle(objects.length, []);
+          rectangle.firstRef = point;
+          objects.push(rectangle); 
+          isDrawing = true;
+        } else {
+          const rectangle = objects[objects.length - 1] as Rectangle;
+          rectangle.secondRef = point;
+          rectangle.arrangePositions();
+          rectangle.render(gl, bufferPos, bufferCol);
+          renderCanvas()
+          isDrawing = false;
+        }
+        break;
+      case ShapeType.POLYGON:
+        if (!isDrawing) {
+          const polygon = new Polygon(objects.length, []);
+          polygon.references.push(point);
+          polygon.arrangePositions();
+          objects.push(polygon); 
+          isDrawing = true;
+        } else {
+          const polygon = objects[objects.length - 1] as Polygon;
+          polygon.references.push(point);
+          polygon.arrangePositions();
+          polygon.render(gl, bufferPos, bufferCol);
+          renderCanvas()
+        }
+        break;
     }
 
   });
 
-  canvas?.addEventListener('mousemove', (e) => {
+  canvas.addEventListener('mousemove', (e) => {
+    const x = e.offsetX;
+    const y = canvas.height - e.offsetY;
+    const point = new Point(x, y);
     if (isDrawing) {
       switch (activeShape) {
         case ShapeType.LINE:
-          const x = e.offsetX;
-          const y = canvas.height - e.offsetY;
-          const point = new Point(x, y);
-          console.log(objects);
-
           const line: Line = objects[objects.length - 1] as Line;
           line.setEndPoint(point);
           line.render(gl, bufferPos, bufferCol);
+          break;
+        
+        case ShapeType.RECTANGLE:
+          const rectangle = objects[objects.length - 1] as Rectangle;
+          rectangle.secondRef = point;
+          rectangle.arrangePositions();
+          rectangle.render(gl, bufferPos, bufferCol);
+          break;
+  
       }
     }
   });
