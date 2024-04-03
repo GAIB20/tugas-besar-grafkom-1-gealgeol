@@ -23,4 +23,9 @@ export class Point {
   public getCoordinate() {
     return [this.x, this.y];
   }
+
+  public setCoordinate(coordinate: number[]) {
+    this.x = coordinate[0];
+    this.y = coordinate[1];
+  }
 }
