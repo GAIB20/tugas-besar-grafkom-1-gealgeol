@@ -8,6 +8,7 @@ import { Shape } from './classes/shape.ts';
 import { ShapeType } from './enum/shape-type.ts';
 import { Rectangle } from './classes/rectangle.ts';
 import { Polygon } from './classes/polygon.ts';
+import { Square } from './classes/square.ts';
 
 function main() {
   // Create WebGL program
@@ -114,6 +115,19 @@ function main() {
           isDrawing = false;
         }
         break;
+      case ShapeType.SQUARE:
+        if (!isDrawing) {
+          const square = new Square(objects.length, point);
+          objects.push(square);
+          isDrawing = true;
+        } else {
+          const square = objects[objects.length - 1] as Square;
+          square.updatePoint(point);
+          square.render(gl, bufferPos, bufferCol);
+          renderCanvas()
+          isDrawing = false;
+        }
+        break;
       case ShapeType.RECTANGLE:
         if (!isDrawing) {
           const rectangle = new Rectangle(objects.length, []);
@@ -158,6 +172,12 @@ function main() {
           const line: Line = objects[objects.length - 1] as Line;
           line.setEndPoint(point);
           line.render(gl, bufferPos, bufferCol);
+          break;
+
+        case ShapeType.SQUARE:
+          const square: Square = objects[objects.length - 1] as Square;
+          square.updatePoint(point);
+          square.render(gl, bufferPos, bufferCol);
           break;
         
         case ShapeType.RECTANGLE:
