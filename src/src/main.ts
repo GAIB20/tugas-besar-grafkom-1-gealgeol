@@ -9,17 +9,18 @@ import { ShapeType } from './enum/shape-type.ts';
 import { Rectangle } from './classes/rectangle.ts';
 import { Polygon } from './classes/polygon.ts';
 import { Square } from './classes/square.ts';
+import { loadFile } from './utils/save-load.ts';
 
 function main() {
   // Create WebGL program
   let _canvas: HTMLCanvasElement | null = document.querySelector<HTMLCanvasElement>('#webgl-canvas');
-  const canvas = _canvas!!
+  const canvas = _canvas!!;
 
   let _gl = canvas.getContext('webgl');
   if (!_gl) {
     return;
   }
-  const gl = _gl!!
+  const gl = _gl!!;
 
   let vertexShader = createShader(gl, gl.VERTEX_SHADER, VertexShaderSource);
   let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, FragmentShaderSource);
@@ -74,27 +75,50 @@ function main() {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     for (const object of objects) {
-      object.render(gl, bufferPos, bufferCol);
+      let shape = object as Shape;
+      shape.render(gl, bufferPos, bufferCol);
     }
 
     window.requestAnimationFrame(renderCanvas);
   };
 
-  document.querySelector("#line-btn")?.addEventListener('click', () => {
+  document.querySelector('#line-btn')?.addEventListener('click', () => {
     activeShape = ShapeType.LINE;
-  })
+  });
 
-  document.querySelector("#square-btn")?.addEventListener('click', () => {
+  document.querySelector('#square-btn')?.addEventListener('click', () => {
     activeShape = ShapeType.SQUARE;
-  })
-  
-  document.querySelector("#rectangle-btn")?.addEventListener('click', () => {
-    activeShape = ShapeType.RECTANGLE;
-  })
+  });
 
-  document.querySelector("#polygon-btn")?.addEventListener('click', () => {
+  document.querySelector('#rectangle-btn')?.addEventListener('click', () => {
+    activeShape = ShapeType.RECTANGLE;
+  });
+
+  document.querySelector('#polygon-btn')?.addEventListener('click', () => {
     activeShape = ShapeType.POLYGON;
-  })
+  });
+
+  document.querySelector('#save-btn')?.addEventListener('click', function() {
+    let jsonData = JSON.stringify(objects, null, 2);
+    let blob = new Blob([jsonData], { type: 'application/json' });
+
+    let a = document.createElement('a');
+    let url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = 'canvas.json';
+
+    document.body.appendChild(a);
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  });
+
+  document.querySelector('#load-btn')?.addEventListener('click', () => {
+    loadFile().then((shapes) => objects = shapes);
+    renderCanvas();
+  });
+
 
   canvas.addEventListener('mousedown', (e) => {
     const x = e.offsetX;
@@ -105,13 +129,13 @@ function main() {
       case ShapeType.LINE:
         if (!isDrawing) {
           const line = new Line(objects.length, point);
-          objects.push(line); 
+          objects.push(line);
           isDrawing = true;
         } else {
           const line = objects[objects.length - 1] as Line;
           line.setEndPoint(point);
           line.render(gl, bufferPos, bufferCol);
-          renderCanvas()
+          renderCanvas();
           isDrawing = false;
         }
         break;
@@ -124,7 +148,7 @@ function main() {
           const square = objects[objects.length - 1] as Square;
           square.updatePoint(point);
           square.render(gl, bufferPos, bufferCol);
-          renderCanvas()
+          renderCanvas();
           isDrawing = false;
         }
         break;
@@ -132,14 +156,14 @@ function main() {
         if (!isDrawing) {
           const rectangle = new Rectangle(objects.length, []);
           rectangle.firstRef = point;
-          objects.push(rectangle); 
+          objects.push(rectangle);
           isDrawing = true;
         } else {
           const rectangle = objects[objects.length - 1] as Rectangle;
           rectangle.secondRef = point;
           rectangle.arrangePositions();
           rectangle.render(gl, bufferPos, bufferCol);
-          renderCanvas()
+          renderCanvas();
           isDrawing = false;
         }
         break;
@@ -148,14 +172,14 @@ function main() {
           const polygon = new Polygon(objects.length, []);
           polygon.references.push(point);
           polygon.arrangePositions();
-          objects.push(polygon); 
+          objects.push(polygon);
           isDrawing = true;
         } else {
           const polygon = objects[objects.length - 1] as Polygon;
           polygon.references.push(point);
           polygon.arrangePositions();
           polygon.render(gl, bufferPos, bufferCol);
-          renderCanvas()
+          renderCanvas();
         }
         break;
     }
@@ -179,14 +203,14 @@ function main() {
           square.updatePoint(point);
           square.render(gl, bufferPos, bufferCol);
           break;
-        
+
         case ShapeType.RECTANGLE:
           const rectangle = objects[objects.length - 1] as Rectangle;
           rectangle.secondRef = point;
           rectangle.arrangePositions();
           rectangle.render(gl, bufferPos, bufferCol);
           break;
-  
+
       }
     }
   });
