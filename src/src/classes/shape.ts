@@ -33,6 +33,10 @@ export abstract class Shape {
     return new Float32Array(bufferPositions);
   }
 
+  public getPoints() {
+    return this.positions;
+  }
+
   public getColors() {
     let bufferColors: number[] = [];
     this.positions.forEach((pos: Point) => bufferColors.push(...pos.getColor()));
@@ -96,7 +100,6 @@ export abstract class Shape {
     this.degree = angle;
     this.applyTransformation();
   }
-
 
   public translate(newX: number, newY: number) {
     const dx = newX - this.tx;
