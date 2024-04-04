@@ -15,6 +15,14 @@ export class Transformation {
     mat3.rotate(this.transformationMatrix, this.transformationMatrix, angleInRadians);
   }
 
+  public translate(tx: number, ty: number) {
+    mat3.translate(this.transformationMatrix, this.transformationMatrix, [tx, ty]);
+  }
+
+  public reset() {
+    mat3.identity(this.transformationMatrix);
+  }
+
   public getMatrix(): mat3 {
     return this.transformationMatrix;
   }
