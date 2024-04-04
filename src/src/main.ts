@@ -227,13 +227,12 @@ function main() {
   });
 
   function updateShapeDropdown(objName: string) {
-    document.getElementById('shape-dropdown')?.dispatchEvent(new Event('change'));
-
     const dropdown = document.getElementById('shape-dropdown') as HTMLSelectElement;
     const option = document.createElement('option');
     option.value = dropdown.options.length.toString(); // Assigning the value based on the length of existing options
     option.text = `${objName}-${dropdown.options.length + 1}`; // Generating text based on the length of existing options
     dropdown.appendChild(option);
+    document.getElementById('shape-dropdown')?.dispatchEvent(new Event('change'));
   }
 
   document.getElementById('slider-rotation')?.addEventListener('input', function (e) {
