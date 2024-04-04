@@ -92,7 +92,7 @@ export abstract class Shape {
   }
 
   public setRotation(angle: number) {
-    this.rotate(angle-this.degree);
+    this.rotate(this.degree-angle);
     this.degree = angle;
     this.applyTransformation();
   }

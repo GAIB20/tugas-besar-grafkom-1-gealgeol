@@ -83,20 +83,49 @@ function main() {
     window.requestAnimationFrame(renderCanvas);
   };
 
+  const lineBtn = document.getElementById('line-btn') as HTMLButtonElement
+  const squareBtn = document.getElementById('square-btn') as HTMLButtonElement
+  const rectangleBtn = document.getElementById('rectangle-btn') as HTMLButtonElement
+  const polygonBtn = document.getElementById('polygon-btn') as HTMLButtonElement
+
   document.querySelector('#line-btn')?.addEventListener('click', () => {
     activeShape = ShapeType.LINE;
+    lineBtn.classList.remove('bg-blue-950', 'text-white')
+    lineBtn.classList.add('text-blue-950', 'bg-white')
+
+    squareBtn.classList.remove('bg-white', 'text-blue-950')
+    rectangleBtn.classList.remove('bg-white', 'text-blue-950')
+    polygonBtn.classList.remove('bg-white', 'text-blue-950')
   });
 
   document.querySelector('#square-btn')?.addEventListener('click', () => {
     activeShape = ShapeType.SQUARE;
+    squareBtn.classList.remove('bg-blue-950', 'text-white')
+    squareBtn.classList.add('text-blue-950', 'bg-white')
+
+    lineBtn.classList.remove('bg-white', 'text-blue-950')
+    rectangleBtn.classList.remove('bg-white', 'text-blue-950')
+    polygonBtn.classList.remove('bg-white', 'text-blue-950')
   });
 
   document.querySelector('#rectangle-btn')?.addEventListener('click', () => {
     activeShape = ShapeType.RECTANGLE;
+    rectangleBtn.classList.remove('bg-blue-950', 'text-white')
+    rectangleBtn.classList.add('text-blue-950', 'bg-white')
+
+    lineBtn.classList.remove('bg-white', 'text-blue-950')
+    squareBtn.classList.remove('bg-white', 'text-blue-950')
+    polygonBtn.classList.remove('bg-white', 'text-blue-950')
   });
 
   document.querySelector('#polygon-btn')?.addEventListener('click', () => {
     activeShape = ShapeType.POLYGON;
+    polygonBtn.classList.remove('bg-blue-950', 'text-white')
+    polygonBtn.classList.add('text-blue-950', 'bg-white')
+
+    lineBtn.classList.remove('bg-white', 'text-blue-950')
+    squareBtn.classList.remove('bg-white', 'text-blue-950')
+    rectangleBtn.classList.remove('bg-white', 'text-blue-950')
   });
 
   document.querySelector('#save-btn')?.addEventListener('click', function() {
@@ -221,7 +250,6 @@ function main() {
           rectangle.arrangePositions();
           rectangle.render(gl, bufferPos, bufferCol);
           break;
-
       }
     }
   });
@@ -251,14 +279,11 @@ function main() {
   const sliderY = document.getElementById('slider-y') as HTMLInputElement
   const sliderLength = document.getElementById('slider-length') as HTMLInputElement
   const sliderRotation = document.getElementById('slider-rotation') as HTMLInputElement
-
   
   const sliderXValue = document.getElementById('slider-x-value') as HTMLSpanElement;
   const sliderYValue = document.getElementById('slider-y-value') as HTMLSpanElement;
   const sliderLengthValue = document.getElementById('slider-length-value') as HTMLSpanElement;
   const sliderRotationValue = document.getElementById('slider-rotation-value') as HTMLSpanElement;
-
-
 
   // Event listener for dropdown selection changes
   document.getElementById('shape-dropdown')?.addEventListener('change', function () {
