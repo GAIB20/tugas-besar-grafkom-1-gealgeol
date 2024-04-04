@@ -120,6 +120,11 @@ function main() {
     renderCanvas();
   });
 
+  const stopDrawingButton = document.querySelector("#stop-drawing-btn")!!
+  stopDrawingButton.addEventListener("click", () => {
+    isDrawing = false
+    stopDrawingButton.classList.add("hidden")
+  })
 
   canvas.addEventListener('mousedown', (e) => {
     const x = e.offsetX;
@@ -132,7 +137,6 @@ function main() {
           const line = new Line(objects.length, point);
           objects.push(line);
           updateShapeDropdown('Line');
-          document.getElementById('shape-dropdown')?.dispatchEvent(new Event('change'));
 
           isDrawing = true;
         } else {
@@ -181,6 +185,7 @@ function main() {
           objects.push(polygon); 
           updateShapeDropdown('Polygon');
           isDrawing = true;
+          stopDrawingButton.classList.remove("hidden")
         } else {
           const polygon = objects[objects.length - 1] as Polygon;
           polygon.references.push(point);
@@ -222,6 +227,8 @@ function main() {
   });
 
   function updateShapeDropdown(objName: string) {
+    document.getElementById('shape-dropdown')?.dispatchEvent(new Event('change'));
+
     const dropdown = document.getElementById('shape-dropdown') as HTMLSelectElement;
     const option = document.createElement('option');
     option.value = dropdown.options.length.toString(); // Assigning the value based on the length of existing options

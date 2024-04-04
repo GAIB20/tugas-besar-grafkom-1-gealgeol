@@ -10,6 +10,7 @@
 
 <body>
     <div id="app" class="h-screen w-screen flex">
+        <button id="stop-drawing-btn" class="absolute px-2 py-1 rounded-lg border-2 end-0 top-0 hidden">Stop drawing</button>
         <div class="flex flex-col h-full bg-blue-950 w-[300px] p-4 gap-4 text-white">
             <h1 class="text-2xl font-bold text-white">GealGeol Drawer</h1>
             <div class="grid grid-cols-2 text-white font-medium gap-2">
@@ -36,6 +37,9 @@
 
                 <label for="shape-dropdown">Shape:</label>
                 <select id="shape-dropdown" class="text-black"></select>
+
+                <label for="point-dropdown">Point:</label>
+                <select id="point-dropdown" class="text-black"></select>
             </div>
           <button id="save-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Save</button>
           <input type="file" id="file-input" accept=".json">
