@@ -26,8 +26,6 @@ export class Rectangle extends Shape {
             new Point(maxX, minY),
             new Point(minX, minY),
             new Point(minX, maxY),
-            new Point(maxX, minY),
-            new Point(minX, maxY),
             new Point(maxX, maxY)
         ]
     }

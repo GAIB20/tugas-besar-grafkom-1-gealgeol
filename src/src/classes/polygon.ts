@@ -18,12 +18,6 @@ export class Polygon extends Shape {
         if (this.references.length < 3) return
 
         const sortedConvexPoints = convexHull(this.references)
-        this.positions = []
-        const ref = sortedConvexPoints[0]
-        for (let i = 1; i < sortedConvexPoints.length - 1; i++) {
-            this.positions.push(ref)
-            this.positions.push(sortedConvexPoints[i])
-            this.positions.push(sortedConvexPoints[i + 1])
-        }
+        this.positions = sortedConvexPoints
     }
 }
