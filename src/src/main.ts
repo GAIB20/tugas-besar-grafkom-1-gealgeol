@@ -83,6 +83,18 @@ function main() {
   document.querySelector('#line-btn')?.addEventListener('click', () => {
     activeShape = ShapeType.LINE;
   })
+  
+  document.querySelector("#square-btn")?.addEventListener('click', () => {
+    activeShape = ShapeType.SQUARE;
+  })
+  
+  document.querySelector("#rectangle-btn")?.addEventListener('click', () => {
+    activeShape = ShapeType.RECTANGLE;
+  })
+
+  document.querySelector("#polygon-btn")?.addEventListener('click', () => {
+    activeShape = ShapeType.POLYGON;
+  })
 
   canvas.addEventListener('mousedown', (e) => {
     const x = e.offsetX;
