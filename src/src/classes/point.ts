@@ -41,4 +41,8 @@ export class Point {
     this.x = coordinate[0];
     this.y = coordinate[1];
   }
+
+  public calculateEuclideanDist(point: Point) {
+    return Math.sqrt((this.x - point.x) ** 2 + (this.y-point.y) ** 2);
+  }
 }
