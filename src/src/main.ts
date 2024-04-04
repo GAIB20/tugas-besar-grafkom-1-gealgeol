@@ -134,7 +134,7 @@ function main() {
 
   document.getElementById('slider-rotation')?.addEventListener('input', function (e) {
     const angle = (e.target as HTMLInputElement).valueAsNumber;
-    console.log(selectedShapeIndex, angle);
+    document.getElementById('slider-rotation-value').textContent = this.value;
 
     if (selectedShapeIndex !== null) {
       const selectedShape = objects[selectedShapeIndex];
@@ -167,17 +167,27 @@ function main() {
   });
 
   // Slider
-  document.getElementById('slider-x')?.addEventListener('input', function () {
+  document.getElementById('slider-x')?.addEventListener('input', function (e) {
     document.getElementById('slider-x-value').textContent = this.value;
+    const newX = parseFloat((e.target as HTMLInputElement).value);
+
+    if (selectedShapeIndex !== null) {
+      const selectedShape = objects[selectedShapeIndex];
+      selectedShape.translate(newX,selectedShape.ty)
+      renderCanvas();
+    }
   });
-  document.getElementById('slider-y')?.addEventListener('input', function () {
+  document.getElementById('slider-y')?.addEventListener('input', function (e) {
     document.getElementById('slider-y-value').textContent = this.value;
+    const newY = parseFloat((e.target as HTMLInputElement).value);
+    if (selectedShapeIndex !== null) {
+      const selectedShape = objects[selectedShapeIndex];
+      selectedShape.translate(selectedShape.tx, newY);
+      renderCanvas();
+    }
   });
   document.getElementById('slider-length')?.addEventListener('input', function () {
     document.getElementById('slider-length-value').textContent = this.value;
-  });
-  document.getElementById('slider-rotation')?.addEventListener('input', function () {
-    document.getElementById('slider-rotation-value').textContent = this.value;
   });
 }
 
