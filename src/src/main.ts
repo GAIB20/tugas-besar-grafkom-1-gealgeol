@@ -166,11 +166,12 @@ function main() {
           const line = new Line(objects.length, point);
           objects.push(line);
           updateShapeDropdown('Line');
-
+          updatePointDropdown(line.id);
           isDrawing = true;
         } else {
           const line = objects[objects.length - 1] as Line;
           line.setEndPoint(point);
+          updatePointDropdown(line.id);
           line.render(gl, bufferPos, bufferCol);
           renderCanvas();
           isDrawing = false;
@@ -181,10 +182,12 @@ function main() {
           const square = new Square(objects.length, point);
           objects.push(square);
           updateShapeDropdown('Square');
+          updatePointDropdown(square.id);
           isDrawing = true;
         } else {
           const square = objects[objects.length - 1] as Square;
           square.updatePoint(point);
+          updatePointDropdown(square.id);
           square.render(gl, bufferPos, bufferCol);
           renderCanvas();
           isDrawing = false;
@@ -196,12 +199,14 @@ function main() {
           rectangle.firstRef = point;
           objects.push(rectangle); 
           updateShapeDropdown('Rectangle');
+          updatePointDropdown(rectangle.id);
           isDrawing = true;
         } else {
           const rectangle = objects[objects.length - 1] as Rectangle;
           rectangle.secondRef = point;
           rectangle.arrangePositions();
           rectangle.render(gl, bufferPos, bufferCol);
+          updatePointDropdown(rectangle.id);
           renderCanvas();
           isDrawing = false;
         }
@@ -213,17 +218,20 @@ function main() {
           polygon.arrangePositions();
           objects.push(polygon); 
           updateShapeDropdown('Polygon');
+          updatePointDropdown(polygon.id);
           isDrawing = true;
           stopDrawingButton.classList.remove("hidden")
         } else {
           const polygon = objects[objects.length - 1] as Polygon;
           polygon.references.push(point);
           polygon.arrangePositions();
+          updatePointDropdown(polygon.id);
           polygon.render(gl, bufferPos, bufferCol);
           renderCanvas();
         }
         break;
     }
+    
   });
 
   canvas.addEventListener('mousemove', (e) => {
@@ -263,6 +271,20 @@ function main() {
     document.getElementById('shape-dropdown')?.dispatchEvent(new Event('change'));
   }
 
+  function updatePointDropdown(objId: number) {
+    const dropdown = document.getElementById('point-dropdown') as HTMLSelectElement;
+    while (dropdown.options.length > 0) dropdown.options.remove(0);
+    const points = objects[objId].positions;
+    points.map((point, index) => {
+      const option = document.createElement('option');
+      option.value = point.toString();
+      const x = point.x;
+      const y = point.y;
+      option.text = `Point (${x}, ${y})`; 
+      dropdown.appendChild(option);
+    })
+  }
+
   document.getElementById('slider-rotation')?.addEventListener('input', function (e) {
     const angle = (e.target as HTMLInputElement).valueAsNumber;
     console.log(selectedShapeIndex, angle);
@@ -288,6 +310,7 @@ function main() {
   // Event listener for dropdown selection changes
   document.getElementById('shape-dropdown')?.addEventListener('change', function () {
     selectedShapeIndex = parseInt((this as HTMLSelectElement).value, 10);
+    updatePointDropdown(selectedShapeIndex);
     sideBar.style.display = 'block';
     sliderX.value = "0";
     sliderY.value = "0";
