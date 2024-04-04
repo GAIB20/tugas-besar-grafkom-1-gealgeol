@@ -14,9 +14,8 @@ export abstract class Shape {
   public sx: number;
   public sy: number;
 
-  
   private transformation: Transformation = new Transformation();
-  
+
   protected constructor(id: number, shapeType: ShapeType) {
     this.id = id;
     this.shapeType = shapeType;
@@ -40,7 +39,7 @@ export abstract class Shape {
     return new Float32Array(bufferColors);
   }
 
-  private getCentroid() {
+  public getCentroid() {
     const xValues = this.positions.map(p => p.x);
     const yValues = this.positions.map(p => p.y);
     const centroidX = xValues.reduce((a, b) => a + b, 0) / xValues.length;
@@ -48,7 +47,7 @@ export abstract class Shape {
     return new Point(centroidX, centroidY);
   }
 
-  abstract getPrimitiveType(gl: WebGLRenderingContext): number
+  abstract getPrimitiveType(gl: WebGLRenderingContext): number;
 
   public render(gl: WebGLRenderingContext, bufferPos: WebGLBuffer, bufferColor: WebGLBuffer) {
     bindBuffer(gl, this.getPositions(), bufferPos);
@@ -93,8 +92,25 @@ export abstract class Shape {
   }
 
   public setRotation(angle: number) {
-    this.degree += angle;
-    this.rotate(angle); 
+    this.rotate(angle-this.degree);
+    this.degree = angle;
     this.applyTransformation();
   }
+
+
+  public translate(newX: number, newY: number) {
+    const dx = newX - this.tx;
+    const dy = newY - this.ty;
+   
+    this.positions = this.positions.map(point => {
+      return new Point(
+        point.x + dx,
+        point.y + dy,
+        point.getColor()
+      );
+    });
+    this.tx = newX;
+    this.ty = newY;
+  }
 }
+
