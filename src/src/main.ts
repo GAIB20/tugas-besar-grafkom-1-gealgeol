@@ -234,8 +234,7 @@ function main() {
     option.value = dropdown.options.length.toString(); // Assigning the value based on the length of existing options
     option.text = `${objName}-${dropdown.options.length + 1}`; // Generating text based on the length of existing options
     dropdown.appendChild(option);
-}
-
+  }
 
   document.getElementById('slider-rotation')?.addEventListener('input', function (e) {
     const angle = (e.target as HTMLInputElement).valueAsNumber;
@@ -286,17 +285,36 @@ function main() {
   });
 
   // Slider
-  sliderX.addEventListener('input', function () {
+  sliderX.addEventListener('input', function (e) {
     sliderXValue.textContent = this.value;
+    const newX = parseFloat((e.target as HTMLInputElement).value);
+
+    if (selectedShapeIndex !== null) {
+      const selectedShape = objects[selectedShapeIndex];
+      selectedShape.translate(newX,selectedShape.ty)
+      renderCanvas();
+    }
   });
-  sliderY.addEventListener('input', function () {
+  sliderY.addEventListener('input', function (e) {
     sliderYValue.textContent = this.value;
+    const newY = parseFloat((e.target as HTMLInputElement).value);
+    if (selectedShapeIndex !== null) {
+      const selectedShape = objects[selectedShapeIndex];
+      selectedShape.translate(selectedShape.tx, newY);
+      renderCanvas();
+    }
   });
   sliderLength.addEventListener('input', function () {
     sliderLengthValue.textContent = this.value;
   });
-  sliderRotation.addEventListener('input', function () {
+  sliderRotation.addEventListener('input', function (e) {
     sliderRotationValue.textContent = this.value;
+    const angle = (e.target as HTMLInputElement).valueAsNumber;
+    if (selectedShapeIndex !== null) {
+      const selectedShape = objects[selectedShapeIndex];
+      selectedShape.setRotation(angle);
+      renderCanvas();
+    }
   });
 }
 
