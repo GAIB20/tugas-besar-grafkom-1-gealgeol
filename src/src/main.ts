@@ -11,6 +11,7 @@ import { Polygon } from './classes/polygon.ts';
 import { Square } from './classes/square.ts';
 import { loadFile } from './utils/save-load.ts';
 import { hexToRgb, rgbToHex } from './utils/tools.ts';
+import { rotate,translate } from './utils/transformations.ts';
 
 function main() {
   // Create WebGL program
@@ -287,15 +288,6 @@ function main() {
     })
   }
 
-  document.getElementById('slider-rotation')?.addEventListener('input', function (e) {
-    const angle = (e.target as HTMLInputElement).valueAsNumber;
-
-    if (selectedShapeIndex !== null) {
-      const selectedShape = objects[selectedShapeIndex];
-      selectedShape.setRotation(angle);
-      renderCanvas();
-    }
-  });
 
   const sideBar = document.getElementById('sidebar') as HTMLDivElement;
   const sliderX = document.getElementById('slider-x') as HTMLInputElement;
@@ -390,7 +382,7 @@ function main() {
 
     if (selectedShapeIndex !== null) {
       const selectedShape = objects[selectedShapeIndex];
-      selectedShape.translate(newX, selectedShape.ty);
+      translate(selectedShape, newX, selectedShape.ty);
       renderCanvas();
     }
   });
@@ -399,7 +391,7 @@ function main() {
     const newY = parseFloat((e.target as HTMLInputElement).value);
     if (selectedShapeIndex !== null) {
       const selectedShape = objects[selectedShapeIndex];
-      selectedShape.translate(selectedShape.tx, newY);
+      translate(selectedShape,selectedShape.tx, newY);
       renderCanvas();
     }
   });
@@ -427,12 +419,13 @@ function main() {
   sliderLength.addEventListener('input', function () {
     sliderLengthValue.textContent = this.value;
   });
+
   sliderRotation.addEventListener('input', function (e) {
     sliderRotationValue.textContent = this.value;
     const angle = (e.target as HTMLInputElement).valueAsNumber;
     if (selectedShapeIndex !== null) {
       const selectedShape = objects[selectedShapeIndex];
-      selectedShape.setRotation(angle);
+      rotate(selectedShape, angle);
       renderCanvas();
     }
   });
