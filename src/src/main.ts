@@ -123,6 +123,7 @@ function main() {
           const rectangle = new Rectangle(objects.length, []);
           rectangle.firstRef = point;
           objects.push(rectangle); 
+          updateShapeDropdown('Rectangle');
           isDrawing = true;
         } else {
           const rectangle = objects[objects.length - 1] as Rectangle;
@@ -139,6 +140,7 @@ function main() {
           polygon.references.push(point);
           polygon.arrangePositions();
           objects.push(polygon); 
+          updateShapeDropdown('Polygon');
           isDrawing = true;
         } else {
           const polygon = objects[objects.length - 1] as Polygon;
@@ -174,16 +176,14 @@ function main() {
     }
   });
 
-  function updateShapeDropdown(objName: string) {
+  function updateShapeDropdown(objName: string, newObject: any) {
     const dropdown = document.getElementById('shape-dropdown') as HTMLSelectElement;
-    dropdown.innerHTML = '';
-    objects.forEach((object, index) => {
-      const option = document.createElement('option');
-      option.value = index.toString();
-      option.text = `${objName}-${index + 1}`;
-      dropdown.appendChild(option);
-    });
-  }
+    const option = document.createElement('option');
+    option.value = dropdown.options.length.toString(); // Assigning the value based on the length of existing options
+    option.text = `${objName}-${dropdown.options.length + 1}`; // Generating text based on the length of existing options
+    dropdown.appendChild(option);
+}
+
 
   document.getElementById('slider-rotation')?.addEventListener('input', function (e) {
     const angle = (e.target as HTMLInputElement).valueAsNumber;
