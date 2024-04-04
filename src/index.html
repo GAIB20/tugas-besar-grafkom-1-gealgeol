@@ -40,6 +40,19 @@
 
                 <label for="point-dropdown">Point:</label>
                 <select id="point-dropdown" class="text-black"></select>
+
+
+                <label for="slider-x-point">Single point translation X: <span id="slider-x-point-value">0</span></label>
+                <input id="slider-x-point" type="range" min="0" max="canvas.width" step="1" value="0" />
+
+                <label for="slider-y-point">Single point translation Y: <span id="slider-y-point-value">0</span></label>
+                <input id="slider-y-point" type="range" min="0" max="canvas.height" step="1" value="0" />
+
+                <div class="grid grid-cols-2 text-white font-medium gap-2">
+                    <button id="save-point-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Save SPT</button>
+                    <button id="delete-point-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Delete Point</button>
+                </div>
+                
             </div>
             <button id="save-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Save</button>
             <input type="file" id="file-input" accept=".json" />
