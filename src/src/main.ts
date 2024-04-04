@@ -348,13 +348,26 @@ function main() {
     sliderLength.setAttribute('min', '1')
     sliderLength.setAttribute('max', canvasWidth.toString())
 
+    if (objects[selectedShapeIndex].shapeType == ShapeType.SQUARE) {
+      const square = objects[selectedShapeIndex] as Square;
+      sliderLength.value = square.length.toString()
+      sliderLengthValue.textContent = square.length.toString()
+    }
+    else if (objects[selectedShapeIndex].shapeType == ShapeType.LINE) {
+      const line = objects[selectedShapeIndex] as Line;
+      sliderLength.value = line.length.toString()
+      sliderLengthValue.textContent = line.length.toString()
+    }
+    else {
+      sliderLengthValue.textContent = '0';
+    }
+
     // Update slider value displays
     sliderXValue.textContent = '0';
     sliderYValue.textContent = '0';
     sliderXPointValue.textContent = '0';
     sliderYPointValue.textContent = '0';
 
-    sliderLengthValue.textContent = '0';
     sliderRotationValue.textContent = '0';
 
   });
