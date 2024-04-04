@@ -11,7 +11,7 @@ import { Polygon } from './classes/polygon.ts';
 import { Square } from './classes/square.ts';
 import { loadFile } from './utils/save-load.ts';
 import { hexToRgb, rgbToHex } from './utils/tools.ts';
-import { rotate,translate } from './utils/transformations.ts';
+import { rotate, translate } from './utils/transformations.ts';
 
 function main() {
   // Create WebGL program
@@ -174,6 +174,8 @@ function main() {
         } else {
           const line = objects[objects.length - 1] as Line;
           line.setEndPoint(point);
+          sliderLength.value = line.length.toString();
+          sliderLengthValue.textContent = line.length.toString()
           updatePointDropdown(line.id);
           line.render(gl, bufferPos, bufferCol);
           renderCanvas();
@@ -190,6 +192,8 @@ function main() {
         } else {
           const square = objects[objects.length - 1] as Square;
           square.updatePoint(point);
+          sliderLength.value = square.length.toString();
+          sliderLengthValue.textContent = square.length.toString()
           updatePointDropdown(square.id);
           square.render(gl, bufferPos, bufferCol);
           renderCanvas();
@@ -306,10 +310,10 @@ function main() {
 
 
   const sliderXPoint = document.getElementById('slider-x-point') as HTMLInputElement;
-  const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement; 
+  const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement;
   const sliderYPoint = document.getElementById('slider-y-point') as HTMLInputElement;
-  const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement; 
-  
+  const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement;
+
 
 
 
@@ -340,6 +344,9 @@ function main() {
     sliderXPoint.setAttribute('max', canvasWidth.toString());
     sliderYPoint.setAttribute('min', (canvasHeight * -1).toString());
     sliderYPoint.setAttribute('max', canvasHeight.toString());
+
+    sliderLength.setAttribute('min', '1')
+    sliderLength.setAttribute('max', canvasWidth.toString())
 
     // Update slider value displays
     sliderXValue.textContent = '0';
@@ -416,8 +423,22 @@ function main() {
     }
   });
 
-  sliderLength.addEventListener('input', function () {
+  sliderLength.addEventListener('input', function (e) {
     sliderLengthValue.textContent = this.value;
+
+    const newLength = parseFloat((e.target as HTMLInputElement).value);
+
+    if (selectedShapeIndex !== null) {
+      if (objects[selectedShapeIndex].shapeType == ShapeType.SQUARE) {
+        const square = objects[selectedShapeIndex] as Square;
+        square.updateLength(newLength);
+      }
+      else if (objects[selectedShapeIndex].shapeType == ShapeType.LINE) {
+        const line = objects[selectedShapeIndex] as Line;
+        line.updateLength(newLength);
+      }
+      renderCanvas();
+    }
   });
 
   sliderRotation.addEventListener('input', function (e) {
