@@ -27,4 +27,9 @@ export class Point {
   public equals(point: Point) {
     return this.x === point.x && this.y === point.y;
   }
+  
+  public setCoordinate(coordinate: number[]) {
+    this.x = coordinate[0];
+    this.y = coordinate[1];
+  }
 }

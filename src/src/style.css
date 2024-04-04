@@ -1,7 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+#sidebar input[type='range'],
+#sidebar input[type='color'],
+#sidebar select {
+  width: 100%;
+  margin-bottom: 10px;
 }

@@ -21,3 +21,4 @@ src/node_modules/
 *.njsproj
 *.sln
 *.sw?
+.node_modules
