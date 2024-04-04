@@ -17,7 +17,15 @@ export class Polygon extends Shape {
     public arrangePositions() {
         if (this.references.length < 3) return
 
-        const sortedConvexPoints = convexHull(this.references)
-        this.positions = sortedConvexPoints
+        this.positions = convexHull(this.references)
+    }
+
+    public deletePoint(point: Point) {
+        if (this.positions.length < 4) {
+            alert("Cannot delete point from polygon with <= 3 points.")
+            return
+        }
+        this.references = this.references.filter((p) => !(p.x === point.x && p.y === point.y))
+        this.arrangePositions()
     }
 }

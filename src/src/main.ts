@@ -268,6 +268,7 @@ function main() {
     option.value = dropdown.options.length.toString(); // Assigning the value based on the length of existing options
     option.text = `${objName}-${dropdown.options.length + 1}`; // Generating text based on the length of existing options
     dropdown.appendChild(option);
+    dropdown.selectedIndex = dropdown.options.length - 1;
     document.getElementById('shape-dropdown')?.dispatchEvent(new Event('change'));
   }
 
@@ -277,7 +278,7 @@ function main() {
     const points = objects[objId].positions;
     points.map((point, index) => {
       const option = document.createElement('option');
-      option.value = point.toString();
+      option.value = point.x.toString() + "," + point.y.toString();
       const x = point.x;
       const y = point.y;
       option.text = `Point (${x}, ${y})`; 
@@ -307,6 +308,15 @@ function main() {
   const sliderLengthValue = document.getElementById('slider-length-value') as HTMLSpanElement;
   const sliderRotationValue = document.getElementById('slider-rotation-value') as HTMLSpanElement;
 
+
+  const sliderXPoint = document.getElementById('slider-x-point') as HTMLInputElement;
+  const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement; 
+  const sliderYPoint = document.getElementById('slider-y-point') as HTMLInputElement;
+  const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement; 
+  
+
+
+
   // Event listener for dropdown selection changes
   document.getElementById('shape-dropdown')?.addEventListener('change', function () {
     selectedShapeIndex = parseInt((this as HTMLSelectElement).value, 10);
@@ -317,6 +327,11 @@ function main() {
     sliderLength.value = "0";
     sliderRotation.value = "0";
 
+    
+    sliderXPoint.value = "0";
+    sliderYPoint.value = "0";
+
+
     const canvasWidth = Math.floor((canvas?.width || 0) / 2);
     const canvasHeight = Math.floor((canvas?.height || 0) / 2);
     sliderX.setAttribute('min', (canvasWidth * -1).toString());
@@ -324,9 +339,18 @@ function main() {
     sliderY.setAttribute('min', (canvasHeight * -1).toString());
     sliderY.setAttribute('max', canvasHeight.toString());
 
+
+    sliderXPoint.setAttribute('min', (canvasWidth * -1).toString());
+    sliderXPoint.setAttribute('max', canvasWidth.toString());
+    sliderYPoint.setAttribute('min', (canvasHeight * -1).toString());
+    sliderYPoint.setAttribute('max', canvasHeight.toString());
+
     // Update slider value displays
     sliderXValue.textContent = '0';
     sliderYValue.textContent = '0';
+    sliderXPointValue.textContent = '0';
+    sliderYPointValue.textContent = '0';
+
     sliderLengthValue.textContent = '0';
     sliderRotationValue.textContent = '0';
   });
@@ -351,6 +375,27 @@ function main() {
       renderCanvas();
     }
   });
+
+  sliderXPoint.addEventListener('input', function (e) {
+    sliderXPointValue.textContent = this.value;
+    const xDif = parseFloat((e.target as HTMLInputElement).value);
+
+    if (selectedShapeIndex !== null) {
+      const selectedShape = objects[selectedShapeIndex];
+      // selectedShape.translate(newX,selectedShape.ty)
+      renderCanvas();
+    }
+  }); 
+  sliderYPoint.addEventListener('input', function (e) {
+    sliderYPointValue.textContent = this.value;
+    const yDif = parseFloat((e.target as HTMLInputElement).value);
+    if (selectedShapeIndex !== null) {
+      const selectedShape = objects[selectedShapeIndex];
+      // selectedShape.translate(selectedShape.tx, newY);
+      renderCanvas();
+    }
+  });
+
   sliderLength.addEventListener('input', function () {
     sliderLengthValue.textContent = this.value;
   });
@@ -363,6 +408,29 @@ function main() {
       renderCanvas();
     }
   });
+
+  const deletePointButton = document.getElementById('delete-point-btn') as HTMLButtonElement;
+  deletePointButton.addEventListener('click', () => {
+    if (selectedShapeIndex !== null && objects[selectedShapeIndex!!].shapeType === ShapeType.POLYGON) {
+      const polygon = objects[selectedShapeIndex!!] as Polygon;
+      const dropdown = document.getElementById('point-dropdown') as HTMLSelectElement;
+      const selectedOption = dropdown.options[dropdown.selectedIndex];
+      const pointStr = selectedOption.value;
+      const numbersArray = pointStr.split(',');
+
+      const x = parseFloat(numbersArray[0].trim());
+      const y = parseFloat(numbersArray[1].trim());      
+
+      polygon.deletePoint(new Point(x, y));
+      renderCanvas();
+      updatePointDropdown(selectedShapeIndex!!);
+    }
+    else {
+      alert('Only polygon point can be deleted!');
+    }
+  });
+
+
 }
 
 main();
