@@ -22,6 +22,7 @@ function main() {
 
   let vertexShader = createShader(gl, gl.VERTEX_SHADER, VertexShaderSource);
   let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, FragmentShaderSource);
+  let selectedShapeIndex: number | null = null;
 
   if (!vertexShader || !fragmentShader) {
     return;
@@ -79,20 +80,8 @@ function main() {
     window.requestAnimationFrame(renderCanvas);
   };
 
-  document.querySelector("#line-btn")?.addEventListener('click', () => {
+  document.querySelector('#line-btn')?.addEventListener('click', () => {
     activeShape = ShapeType.LINE;
-  })
-
-  document.querySelector("#square-btn")?.addEventListener('click', () => {
-    activeShape = ShapeType.SQUARE;
-  })
-  
-  document.querySelector("#rectangle-btn")?.addEventListener('click', () => {
-    activeShape = ShapeType.RECTANGLE;
-  })
-
-  document.querySelector("#polygon-btn")?.addEventListener('click', () => {
-    activeShape = ShapeType.POLYGON;
   })
 
   canvas.addEventListener('mousedown', (e) => {
@@ -104,7 +93,10 @@ function main() {
       case ShapeType.LINE:
         if (!isDrawing) {
           const line = new Line(objects.length, point);
-          objects.push(line); 
+          objects.push(line);
+          updateShapeDropdown('Line');
+          document.getElementById('shape-dropdown')?.dispatchEvent(new Event('change'));
+
           isDrawing = true;
         } else {
           const line = objects[objects.length - 1] as Line;
@@ -145,7 +137,6 @@ function main() {
         }
         break;
     }
-
   });
 
   canvas.addEventListener('mousemove', (e) => {
@@ -169,6 +160,65 @@ function main() {
   
       }
     }
+  });
+
+  function updateShapeDropdown(objName: string) {
+    const dropdown = document.getElementById('shape-dropdown') as HTMLSelectElement;
+    dropdown.innerHTML = '';
+    objects.forEach((object, index) => {
+      const option = document.createElement('option');
+      option.value = index.toString();
+      option.text = `${objName}-${index + 1}`;
+      dropdown.appendChild(option);
+    });
+  }
+
+  document.getElementById('slider-rotation')?.addEventListener('input', function (e) {
+    const angle = (e.target as HTMLInputElement).valueAsNumber;
+    console.log(selectedShapeIndex, angle);
+
+    if (selectedShapeIndex !== null) {
+      const selectedShape = objects[selectedShapeIndex];
+      selectedShape.setRotation(angle);
+      renderCanvas();
+    }
+  });
+
+  // Event listener for dropdown selection changes
+  document.getElementById('shape-dropdown')?.addEventListener('change', function () {
+    selectedShapeIndex = parseInt((this as HTMLSelectElement).value, 10);
+    document.getElementById('sidebar').style.display = 'block';
+    document.getElementById('slider-x').value = 0;
+    document.getElementById('slider-y').value = 0;
+    document.getElementById('slider-length').value = 0;
+    document.getElementById('slider-rotation').value = 0;
+
+    const canvasWidth = Math.floor((canvas?.width || 0) / 2);
+    const canvasHeight = Math.floor((canvas?.height || 0) / 2);
+    document.getElementById('slider-x').setAttribute('min', (canvasWidth * -1).toString());
+    document.getElementById('slider-x').setAttribute('max', canvasWidth.toString());
+    document.getElementById('slider-y').setAttribute('min', (canvasHeight * -1).toString());
+    document.getElementById('slider-y').setAttribute('max', canvasHeight.toString());
+
+    // Update slider value displays
+    document.getElementById('slider-x-value').textContent = 0;
+    document.getElementById('slider-y-value').textContent = 0;
+    document.getElementById('slider-length-value').textContent = 0;
+    document.getElementById('slider-rotation-value').textContent = 0;
+  });
+
+  // Slider
+  document.getElementById('slider-x')?.addEventListener('input', function () {
+    document.getElementById('slider-x-value').textContent = this.value;
+  });
+  document.getElementById('slider-y')?.addEventListener('input', function () {
+    document.getElementById('slider-y-value').textContent = this.value;
+  });
+  document.getElementById('slider-length')?.addEventListener('input', function () {
+    document.getElementById('slider-length-value').textContent = this.value;
+  });
+  document.getElementById('slider-rotation')?.addEventListener('input', function () {
+    document.getElementById('slider-rotation-value').textContent = this.value;
   });
 }
 
