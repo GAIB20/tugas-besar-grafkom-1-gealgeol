@@ -272,16 +272,18 @@ function main() {
   }
 
   function updatePointDropdown(objId: number) {
-    const dropdown = document.getElementById('point-dropdown') as HTMLSelectElement;
-    while (dropdown.options.length > 0) dropdown.options.remove(0);
+    while (pointDropdown.options.length > 0) pointDropdown.options.remove(0);
     const points = objects[objId].positions;
     points.map((point, index) => {
       const option = document.createElement('option');
       option.value = point.x.toString() + "," + point.y.toString();
+      option.value = index.toString();
+      colorValue.textContent = rgbToHex(point.getColor());
+      colorPicker.value = rgbToHex(point.getColor());
       const x = point.x;
       const y = point.y;
       option.text = `Point (${x}, ${y})`; 
-      dropdown.appendChild(option);
+      pointDropdown.appendChild(option);
     })
   }
 
@@ -361,23 +363,24 @@ function main() {
   // Event listener for dropdown selection point
   document.getElementById('point-dropdown')?.addEventListener('change', function () {
     selectedPointIndex = parseInt((this as HTMLSelectElement).value, 10);
+    selectedShapeIndex = parseInt((document.getElementById('shape-dropdown') as HTMLSelectElement).value, 10)
     console.log('hai', selectedPointIndex);
-    if (selectedShapeIndex) {
-      const color = rgbToHex(objects[selectedShapeIndex].getPoints()[selectedPointIndex].getColor());
-      colorPicker.value = color;
-      colorValue.textContent = color;
-    }
+    const color = rgbToHex(objects[selectedShapeIndex].getPoints()[selectedPointIndex].getColor());
+    colorPicker.value = color;
+    colorValue.textContent = color;
+    
   });
 
   colorPicker.addEventListener('change', function (e) {
+    selectedPointIndex = parseInt((document.getElementById('point-dropdown') as HTMLSelectElement).value, 10);
+    selectedShapeIndex = parseInt((document.getElementById('shape-dropdown') as HTMLSelectElement).value, 10);
     const hex = (e.target as HTMLInputElement).value;
     colorValue.textContent = hex;
     colorPicker.value = hex;
-    if (selectedShapeIndex && selectedPointIndex) {
-      objects[selectedShapeIndex].getPoints()[selectedPointIndex].setColor(hexToRgb(hex));
-      console.log("tes",objects[selectedShapeIndex].getPoints()[selectedPointIndex].getColor());
-      renderCanvas();
-    }
+    objects[selectedShapeIndex].getPoints()[selectedPointIndex].setColor(hexToRgb(hex));
+    console.log("tes",objects[selectedShapeIndex].getPoints()[selectedPointIndex].getColor());
+    renderCanvas();
+    
   });
 
   // Slider
