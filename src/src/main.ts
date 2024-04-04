@@ -148,8 +148,20 @@ function main() {
   });
 
   document.querySelector('#load-btn')?.addEventListener('click', () => {
-    loadFile().then(shapes => (objects = shapes));
-    renderCanvas();
+    objects = []
+    shapeDropdown.innerHTML = ''
+    pointDropdown.innerHTML = ''
+    renderCanvas()
+    loadFile().then(shapes => {
+      objects = shapes
+      renderCanvas();
+      for (let object of objects) {
+        updateShapeDropdown(object.shapeType);
+        updatePointDropdown(object.id);
+      }
+      const fileInput = document.getElementById("file-input") as HTMLInputElement
+      fileInput.value = "";
+    });
   });
 
   const stopDrawingButton = document.querySelector('#stop-drawing-btn')!!;
