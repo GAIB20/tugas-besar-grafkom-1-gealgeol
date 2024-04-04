@@ -19,6 +19,15 @@ export class Point {
   public getColor() {
     return [this.color.r, this.color.g, this.color.b, this.color.a];
   }
+  
+  public setColor(color: number[]) { 
+    this.color = {
+      r: color[0],
+      g: color[1],
+      b: color[2],
+      a: color[3],
+    };
+  }
 
   public getCoordinate() {
     return [this.x, this.y];
