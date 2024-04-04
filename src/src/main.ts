@@ -147,6 +147,7 @@ function main() {
         if (!isDrawing) {
           const square = new Square(objects.length, point);
           objects.push(square);
+          updateShapeDropdown('Square');
           isDrawing = true;
         } else {
           const square = objects[objects.length - 1] as Square;
@@ -240,41 +241,55 @@ function main() {
     }
   });
 
+  const sideBar = document.getElementById('sidebar') as HTMLDivElement
+  const sliderX = document.getElementById('slider-x') as HTMLInputElement
+  const sliderY = document.getElementById('slider-y') as HTMLInputElement
+  const sliderLength = document.getElementById('slider-length') as HTMLInputElement
+  const sliderRotation = document.getElementById('slider-rotation') as HTMLInputElement
+
+  
+  const sliderXValue = document.getElementById('slider-x-value') as HTMLSpanElement;
+  const sliderYValue = document.getElementById('slider-y-value') as HTMLSpanElement;
+  const sliderLengthValue = document.getElementById('slider-length-value') as HTMLSpanElement;
+  const sliderRotationValue = document.getElementById('slider-rotation-value') as HTMLSpanElement;
+
+
+
   // Event listener for dropdown selection changes
   document.getElementById('shape-dropdown')?.addEventListener('change', function () {
     selectedShapeIndex = parseInt((this as HTMLSelectElement).value, 10);
-    document.getElementById('sidebar').style.display = 'block';
-    document.getElementById('slider-x').value = 0;
-    document.getElementById('slider-y').value = 0;
-    document.getElementById('slider-length').value = 0;
-    document.getElementById('slider-rotation').value = 0;
+    sideBar.style.display = 'block';
+    sliderX.value = "0";
+    sliderY.value = "0";
+    sliderLength.value = "0";
+    sliderRotation.value = "0";
 
     const canvasWidth = Math.floor((canvas?.width || 0) / 2);
     const canvasHeight = Math.floor((canvas?.height || 0) / 2);
-    document.getElementById('slider-x').setAttribute('min', (canvasWidth * -1).toString());
-    document.getElementById('slider-x').setAttribute('max', canvasWidth.toString());
-    document.getElementById('slider-y').setAttribute('min', (canvasHeight * -1).toString());
-    document.getElementById('slider-y').setAttribute('max', canvasHeight.toString());
+    sliderX.setAttribute('min', (canvasWidth * -1).toString());
+    sliderX.setAttribute('max', canvasWidth.toString());
+    sliderY.setAttribute('min', (canvasHeight * -1).toString());
+    sliderY.setAttribute('max', canvasHeight.toString());
 
     // Update slider value displays
-    document.getElementById('slider-x-value').textContent = 0;
-    document.getElementById('slider-y-value').textContent = 0;
-    document.getElementById('slider-length-value').textContent = 0;
-    document.getElementById('slider-rotation-value').textContent = 0;
+    sliderXValue.textContent = '0';
+    sliderYValue.textContent = '0';
+    sliderLengthValue.textContent = '0';
+    sliderRotationValue.textContent = '0';
   });
 
   // Slider
-  document.getElementById('slider-x')?.addEventListener('input', function () {
-    document.getElementById('slider-x-value').textContent = this.value;
+  sliderX.addEventListener('input', function () {
+    sliderXValue.textContent = this.value;
   });
-  document.getElementById('slider-y')?.addEventListener('input', function () {
-    document.getElementById('slider-y-value').textContent = this.value;
+  sliderY.addEventListener('input', function () {
+    sliderYValue.textContent = this.value;
   });
-  document.getElementById('slider-length')?.addEventListener('input', function () {
-    document.getElementById('slider-length-value').textContent = this.value;
+  sliderLength.addEventListener('input', function () {
+    sliderLengthValue.textContent = this.value;
   });
-  document.getElementById('slider-rotation')?.addEventListener('input', function () {
-    document.getElementById('slider-rotation-value').textContent = this.value;
+  sliderRotation.addEventListener('input', function () {
+    sliderRotationValue.textContent = this.value;
   });
 }
 
