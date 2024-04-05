@@ -86,7 +86,6 @@ const objectToShape = (objects: ShapeObject[]): Shape[] => {
       shapes.push(rectangle);
     } else {
       let polygon = new Polygon(object.id, objectsToPoints(object.positions));
-      polygon.references = objectsToPoints(object.references!);
       shapes.push(polygon);
     }
   }
