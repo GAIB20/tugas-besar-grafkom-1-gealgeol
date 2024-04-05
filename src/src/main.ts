@@ -12,6 +12,7 @@ import { Square } from './classes/square.ts';
 import { loadFile } from './utils/save-load.ts';
 import { hexToRgb, rgbToHex } from './utils/tools.ts';
 import { rotate, scale, translate } from './utils/transformations.ts';
+import { animateRotation } from './utils/animation.ts';
 
 function main() {
   // Create WebGL program
@@ -86,6 +87,58 @@ function main() {
     window.requestAnimationFrame(renderCanvas);
   };
 
+  function updateShapeDropdown(objName: string) {
+    const option = document.createElement('option');
+    option.value = shapeDropdown.options.length.toString(); // Assigning the value based on the length of existing options
+    option.text = `${objName}-${shapeDropdown.options.length + 1}`; // Generating text based on the length of existing options
+    shapeDropdown.appendChild(option);
+    shapeDropdown.selectedIndex = shapeDropdown.options.length - 1;
+    document.getElementById('shape-dropdown')?.dispatchEvent(new Event('change'));
+  }
+
+  function updatePointDropdown(objId: number) {
+    while (pointDropdown.options.length > 0) pointDropdown.options.remove(0);
+    const points = objects[objId].positions;
+    points.map((point, index) => {
+      const option = document.createElement('option');
+      option.value = point.x.toString() + ',' + point.y.toString();
+      option.value = index.toString();
+      colorValue.textContent = rgbToHex(point.getColor());
+      colorPicker.value = rgbToHex(point.getColor());
+      const x = point.x;
+      const y = point.y;
+      option.text = `Point (${x}, ${y})`;
+      pointDropdown.appendChild(option);
+    });
+  }
+
+  //   function animateRotation(shape: Shape, targetDegree: number, duration: number) {
+  //     const startTime = performance.now();
+  //     const startDegree = shape.degree;
+  //     let degreeChange = targetDegree - startDegree;
+
+  //     if (degreeChange > 180) degreeChange -= 360;
+  //     if (degreeChange < -180) degreeChange += 360;
+
+  //     const animate = (currentTime: number) => {
+  //         const elapsedTime = currentTime - startTime;
+  //         const fraction = elapsedTime / duration;
+
+  //         // Ensure the animation stops at the exact targetDegree after duration
+  //         if (fraction >= 1) {
+  //             rotate(shape, targetDegree);
+  //             shape.degree = targetDegree; // Ensure final degree is set accurately
+  //         } else {
+  //             const currentDegree = startDegree + degreeChange * fraction;
+  //             rotate(shape, currentDegree);
+  //             shape.degree = currentDegree; // Update degree for intermediate steps
+  //             requestAnimationFrame(animate);
+  //         }
+  //     };
+
+  //     requestAnimationFrame(animate);
+  // }
+
   const lineBtn = document.getElementById('line-btn') as HTMLButtonElement;
   const squareBtn = document.getElementById('square-btn') as HTMLButtonElement;
   const rectangleBtn = document.getElementById('rectangle-btn') as HTMLButtonElement;
@@ -148,19 +201,19 @@ function main() {
   });
 
   document.querySelector('#load-btn')?.addEventListener('click', () => {
-    objects = []
-    shapeDropdown.innerHTML = ''
-    pointDropdown.innerHTML = ''
-    renderCanvas()
+    objects = [];
+    shapeDropdown.innerHTML = '';
+    pointDropdown.innerHTML = '';
+    renderCanvas();
     loadFile().then(shapes => {
-      objects = shapes
+      objects = shapes;
       renderCanvas();
       for (let object of objects) {
         updateShapeDropdown(object.shapeType);
         updatePointDropdown(object.id);
       }
-      const fileInput = document.getElementById("file-input") as HTMLInputElement
-      fileInput.value = "";
+      const fileInput = document.getElementById('file-input') as HTMLInputElement;
+      fileInput.value = '';
     });
   });
 
@@ -186,9 +239,9 @@ function main() {
         } else {
           const line = objects[objects.length - 1] as Line;
           line.setEndPoint(point);
-          console.log(line.length)
-          sliderLength.value = "0";
-          sliderLengthValue.textContent = "0"
+          console.log(line.length);
+          sliderLength.value = '0';
+          sliderLengthValue.textContent = '0';
           updatePointDropdown(line.id);
           line.render(gl, bufferPos, bufferCol);
           renderCanvas();
@@ -206,7 +259,7 @@ function main() {
           const square = objects[objects.length - 1] as Square;
           square.updatePoint(point);
           sliderLength.value = square.length.toString();
-          sliderLengthValue.textContent = square.length.toString()
+          sliderLengthValue.textContent = square.length.toString();
           updatePointDropdown(square.id);
           square.render(gl, bufferPos, bufferCol);
           renderCanvas();
@@ -251,7 +304,6 @@ function main() {
         }
         break;
     }
-    
   });
 
   canvas.addEventListener('mousemove', e => {
@@ -280,32 +332,6 @@ function main() {
     }
   });
 
-  function updateShapeDropdown(objName: string) {
-    const option = document.createElement('option');
-    option.value = shapeDropdown.options.length.toString(); // Assigning the value based on the length of existing options
-    option.text = `${objName}-${shapeDropdown.options.length + 1}`; // Generating text based on the length of existing options
-    shapeDropdown.appendChild(option);
-    shapeDropdown.selectedIndex = shapeDropdown.options.length - 1;
-    document.getElementById('shape-dropdown')?.dispatchEvent(new Event('change'));
-  }
-
-  function updatePointDropdown(objId: number) {
-    while (pointDropdown.options.length > 0) pointDropdown.options.remove(0);
-    const points = objects[objId].positions;
-    points.map((point, index) => {
-      const option = document.createElement('option');
-      option.value = point.x.toString() + "," + point.y.toString();
-      option.value = index.toString();
-      colorValue.textContent = rgbToHex(point.getColor());
-      colorPicker.value = rgbToHex(point.getColor());
-      const x = point.x;
-      const y = point.y;
-      option.text = `Point (${x}, ${y})`; 
-      pointDropdown.appendChild(option);
-    })
-  }
-
-
   const sideBar = document.getElementById('sidebar') as HTMLDivElement;
   const sliderX = document.getElementById('slider-x') as HTMLInputElement;
   const sliderY = document.getElementById('slider-y') as HTMLInputElement;
@@ -321,14 +347,10 @@ function main() {
   const sliderLengthValue = document.getElementById('slider-length-value') as HTMLSpanElement;
   const sliderRotationValue = document.getElementById('slider-rotation-value') as HTMLSpanElement;
 
-
   const sliderXPoint = document.getElementById('slider-x-point') as HTMLInputElement;
   const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement;
   const sliderYPoint = document.getElementById('slider-y-point') as HTMLInputElement;
   const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement;
-
-
-
 
   // Event listener for dropdown selection changes
   document.getElementById('shape-dropdown')?.addEventListener('change', function () {
@@ -340,10 +362,8 @@ function main() {
     sliderLength.value = '0';
     sliderRotation.value = '0';
 
-    
-    sliderXPoint.value = "0";
-    sliderYPoint.value = "0";
-
+    sliderXPoint.value = '0';
+    sliderYPoint.value = '0';
 
     const canvasWidth = Math.floor((canvas?.width || 0) / 2);
     const canvasHeight = Math.floor((canvas?.height || 0) / 2);
@@ -352,26 +372,23 @@ function main() {
     sliderY.setAttribute('min', (canvasHeight * -1).toString());
     sliderY.setAttribute('max', canvasHeight.toString());
 
-
     sliderXPoint.setAttribute('min', (canvasWidth * -1).toString());
     sliderXPoint.setAttribute('max', canvasWidth.toString());
     sliderYPoint.setAttribute('min', (canvasHeight * -1).toString());
     sliderYPoint.setAttribute('max', canvasHeight.toString());
 
-    sliderLength.setAttribute('min', '1')
-    sliderLength.setAttribute('max', canvasWidth.toString())
+    sliderLength.setAttribute('min', '1');
+    sliderLength.setAttribute('max', canvasWidth.toString());
 
     if (objects[selectedShapeIndex].shapeType == ShapeType.SQUARE) {
       const square = objects[selectedShapeIndex] as Square;
-      sliderLength.value = square.length.toString()
-      sliderLengthValue.textContent = square.length.toString()
-    }
-    else if (objects[selectedShapeIndex].shapeType == ShapeType.LINE) {
+      sliderLength.value = square.length.toString();
+      sliderLengthValue.textContent = square.length.toString();
+    } else if (objects[selectedShapeIndex].shapeType == ShapeType.LINE) {
       const line = objects[selectedShapeIndex] as Line;
-      sliderLength.value = line.length.toString()
-      sliderLengthValue.textContent = line.length.toString()
-    }
-    else {
+      sliderLength.value = line.length.toString();
+      sliderLengthValue.textContent = line.length.toString();
+    } else {
       sliderLengthValue.textContent = '0';
     }
 
@@ -382,18 +399,16 @@ function main() {
     sliderYPointValue.textContent = '0';
 
     sliderRotationValue.textContent = '0';
-
   });
 
   // Event listener for dropdown selection point
   document.getElementById('point-dropdown')?.addEventListener('change', function () {
     selectedPointIndex = parseInt((this as HTMLSelectElement).value, 10);
-    selectedShapeIndex = parseInt((document.getElementById('shape-dropdown') as HTMLSelectElement).value, 10)
+    selectedShapeIndex = parseInt((document.getElementById('shape-dropdown') as HTMLSelectElement).value, 10);
     console.log('hai', selectedPointIndex);
     const color = rgbToHex(objects[selectedShapeIndex].getPoints()[selectedPointIndex].getColor());
     colorPicker.value = color;
     colorValue.textContent = color;
-    
   });
 
   colorPicker.addEventListener('change', function (e) {
@@ -403,9 +418,8 @@ function main() {
     colorValue.textContent = hex;
     colorPicker.value = hex;
     objects[selectedShapeIndex].getPoints()[selectedPointIndex].setColor(hexToRgb(hex));
-    console.log("tes",objects[selectedShapeIndex].getPoints()[selectedPointIndex].getColor());
+    console.log('tes', objects[selectedShapeIndex].getPoints()[selectedPointIndex].getColor());
     renderCanvas();
-    
   });
 
   // Slider
@@ -424,7 +438,7 @@ function main() {
     const newY = parseFloat((e.target as HTMLInputElement).value);
     if (selectedShapeIndex !== null) {
       const selectedShape = objects[selectedShapeIndex];
-      translate(selectedShape,selectedShape.tx, newY);
+      translate(selectedShape, selectedShape.tx, newY);
       renderCanvas();
     }
   });
@@ -438,7 +452,7 @@ function main() {
       // selectedShape.translate(newX,selectedShape.ty)
       renderCanvas();
     }
-  }); 
+  });
   sliderYPoint.addEventListener('input', function (e) {
     sliderYPointValue.textContent = this.value;
     const yDif = parseFloat((e.target as HTMLInputElement).value);
@@ -457,8 +471,7 @@ function main() {
       if (objects[selectedShapeIndex].shapeType == ShapeType.SQUARE) {
         const square = objects[selectedShapeIndex] as Square;
         square.updateLength(newLength);
-      }
-      else if (objects[selectedShapeIndex].shapeType == ShapeType.LINE) {
+      } else if (objects[selectedShapeIndex].shapeType == ShapeType.LINE) {
         const line = objects[selectedShapeIndex] as Line;
         line.setLength(newLength);
         scale(line, line.sx, line.sy);
@@ -488,18 +501,54 @@ function main() {
       const numbersArray = pointStr.split(',');
 
       const x = parseFloat(numbersArray[0].trim());
-      const y = parseFloat(numbersArray[1].trim());      
+      const y = parseFloat(numbersArray[1].trim());
 
       polygon.deletePoint(new Point(x, y));
       renderCanvas();
       updatePointDropdown(selectedShapeIndex!!);
-    }
-    else {
+    } else {
       alert('Only polygon point can be deleted!');
     }
   });
 
+  let animateFlag = false;
+  let lastTime = 0;
+    const anglePerSecond = 30; 
 
+    function animate(time: number): void {
+      if (!animateFlag) {
+        return; // stop animation
+      }
+      if (!lastTime) {
+        lastTime = time;
+      }
+
+      const deltaTime = (time - lastTime) / 1000;
+      const angle = anglePerSecond * deltaTime;
+
+      if (selectedShapeIndex != null) {
+        const selectedShape = objects[selectedShapeIndex];
+        animateRotation(selectedShape, angle);
+      }
+
+      renderCanvas();
+      lastTime = time; 
+      requestAnimationFrame(animate);
+    }
+
+    // Start the animation loop
+    requestAnimationFrame(animate);
+  
+  document.getElementById('animation-btn')?.addEventListener('click', () => {
+    if (!animateFlag) {
+      animateFlag = true;
+      requestAnimationFrame(animate);
+  }
+  })
+
+  document.getElementById('stop-animation-btn')?.addEventListener('click', () => { 
+    animateFlag = false;
+  });
 }
 
 main();
