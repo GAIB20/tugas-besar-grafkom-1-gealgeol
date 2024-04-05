@@ -1,15 +1,16 @@
 import { Shape } from './shape.ts';
 import { Point } from './point.ts';
 import { ShapeType } from '../enum/shape-type.ts';
-import { Wrapper } from '../utils/wrapper.ts';
 
 export class Line extends Shape {
   public length: number;
+  public oriLength: number;
 
   public constructor(id: number, point: Point) {
     super(id, ShapeType.LINE);
     this.positions = [...this.positions, point];
     this.length = 0;
+    this.oriLength = 0;
   }
 
   public getPrimitiveType(gl: WebGLRenderingContext): number {
@@ -24,20 +25,25 @@ export class Line extends Shape {
       this.positions[1].y = point.y;
     }
     this.length = this.positions[0].calculateEuclideanDist(point);
+    this.oriLength = this.length
   }
 
-  public updateLength(newLength: number) {
-    const cos = (this.positions[1].x - this.positions[0].x) / this.length;
-    const sin = (this.positions[1].y - this.positions[0].y) / this.length;
+  public movePoint(dLength: number, pointIndex: number) {
+    let posMove = this.positions[pointIndex]
+    let oppositePos = this.positions[(pointIndex + 1) % 2]
+    const cos = (posMove.x - oppositePos.x) / this.length;
+    const sin = (posMove.y - oppositePos.y) / this.length;
 
-    this.positions[1].x = newLength * cos + this.positions[0].x;
-    this.positions[1].y = newLength * sin + this.positions[0].y;
+    let newLength = this.oriLength + dLength
+    posMove.x = newLength * cos + oppositePos.x;
+    posMove.y = newLength * sin + oppositePos.y;
     this.length = newLength;
   }
 
-  public setLength(newLength: number) {
+  public updateLength(newLength: number) {
     this.sx = 1 + (newLength-this.length)/this.length
     this.sy = 1 + (newLength-this.length)/this.length
     this.length = newLength
+    this.oriLength = newLength
   }
 }
