@@ -41,12 +41,12 @@ export class Rectangle extends Shape {
         )
 
         let gradVector = (_firstRef.y - _secondRef.y) / (_firstRef.x - _secondRef.x)
-
+        
 
         if (oldPointObj.equals(_firstRef)) {
+            console.log("ehre")
             let xDif = oldPointObj.x - x
             let yDif = oldPointObj.y - y
-            
             if (xDif === 0 && yDif === 0) {
                 return
             } else if (xDif === 0) {
@@ -56,12 +56,16 @@ export class Rectangle extends Shape {
             } else {
                 console.log("HELB")
             }
-            _firstRef.x += xDif
-            _firstRef.y += yDif
-            this.arrangePositions() 
+            _firstRef.x += xDif/2
+            _secondRef.x += xDif/2
+            _firstRef.y += yDif/2
+            _secondRef.y += yDif/2 
+
         } else if (oldPointObj.equals(_secondRef)) {
             //
         }
+
+
     }
 
 

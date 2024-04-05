@@ -413,8 +413,10 @@ function main() {
     if (selectedShapeIndex == null) return 
     const xDif = parseFloat((e.target as HTMLInputElement).value);
     const selectedShape = objects[selectedShapeIndex!!];  
-    let pointWrapper = new Wrapper(sptPointRef)
-    
+    const pointWrapper = new Wrapper(sptPointRef)
+    if (selectedShape instanceof Rectangle) {
+      pointWrapper.obj = new Point(sptPointXOld, sptPointYOld)
+    }
     selectedShape.singlePointTranslate(pointWrapper, sptPointXOld + xDif, sptPointYOld)
 
     renderCanvas();
