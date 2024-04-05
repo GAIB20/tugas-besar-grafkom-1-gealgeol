@@ -2,6 +2,8 @@ import { Point } from './point.ts';
 import { bindBuffer } from '../utils/web-gl.ts';
 import { ShapeType } from '../enum/shape-type.ts';
 import { mat3, vec2 } from 'gl-matrix';
+import { Matrix } from './matrix.ts';
+import { Vector } from './vector.ts';
 
 export abstract class Shape {
   public id: number;
@@ -59,10 +61,11 @@ export abstract class Shape {
   }
 
   public applyTransformation() {
-    const matrix = mat3.create();
+    const matrix = Matrix.create();
     for (let i = 0; i < this.positions.length; i++) {
       const pos = this.positions[i].getCoordinate();
-      const transformedPos = vec2.transformMat3(vec2.create(), vec2.fromValues(pos[0], pos[1]), matrix);
+      const vec = Vector.fromValues(pos[0], pos[1]);
+      const transformedPos = vec.transformMat(matrix.data).toArray();
       this.positions[i].setCoordinate([transformedPos[0], transformedPos[1]]);
     }
   }
