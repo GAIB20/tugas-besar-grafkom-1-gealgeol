@@ -75,6 +75,7 @@ function main() {
   let activeShape: ShapeType = ShapeType.LINE;
   let selectedShapeIndex: number | null = null;
   let selectedPointIndex: number | null = null;
+  let polygonPoints: Point[] = [];
 
   const renderCanvas = () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -297,13 +298,15 @@ function main() {
     let points = object.positions;
     points.map((point, index) => {
       const option = document.createElement('option');
-      option.value = point.x.toString() + "," + point.y.toString();
+      if (object.shapeType == ShapeType.POLYGON) {
+        option.value = point.x.toString() + "," + point.y.toString();
+      }
       option.value = index.toString();
       colorValue.textContent = rgbToHex(point.getColor());
       colorPicker.value = rgbToHex(point.getColor());
       const x = point.x;
       const y = point.y;
-      option.text = `Point (${x}, ${y})`; 
+      option.text = `Point-${index + 1}`; 
       pointDropdown.appendChild(option);
     })
   }
@@ -408,7 +411,6 @@ function main() {
     objects[selectedShapeIndex].getPoints()[selectedPointIndex].setColor(hexToRgb(hex));
     console.log("tes",objects[selectedShapeIndex].getPoints()[selectedPointIndex].getColor());
     renderCanvas();
-    
   });
 
   // Slider
@@ -419,6 +421,7 @@ function main() {
     if (selectedShapeIndex !== null) {
       const selectedShape = objects[selectedShapeIndex];
       translate(selectedShape, newX, selectedShape.ty);
+      console.log(selectedShape.positions[0].x, selectedShape.positions[0].y)
       renderCanvas();
     }
   });
@@ -523,14 +526,11 @@ function main() {
     if (selectedShapeIndex !== null && objects[selectedShapeIndex!!].shapeType === ShapeType.POLYGON) {
       const polygon = objects[selectedShapeIndex!!] as Polygon;
       const dropdown = document.getElementById('point-dropdown') as HTMLSelectElement;
-      const selectedOption = dropdown.options[dropdown.selectedIndex];
-      const pointStr = selectedOption.value;
-      const numbersArray = pointStr.split(',');
+      const pointIndex = parseInt(dropdown.options[dropdown.selectedIndex].value, 10);
+      const selectedPoint = polygon.getPoints()[pointIndex];
+      console.log(selectedPoint)
 
-      const x = parseFloat(numbersArray[0].trim());
-      const y = parseFloat(numbersArray[1].trim());      
-
-      polygon.deletePoint(new Point(x, y));
+      polygon.deletePoint(selectedPoint);
       renderCanvas();
       updatePointDropdown(selectedShapeIndex!!);
     }
