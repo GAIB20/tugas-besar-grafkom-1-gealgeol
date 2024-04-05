@@ -102,13 +102,10 @@ function main() {
     const points = objects[objId].positions;
     points.map((point, index) => {
       const option = document.createElement('option');
-      option.value = point.x.toString() + ',' + point.y.toString();
       option.value = index.toString();
       colorValue.textContent = rgbToHex(point.getColor());
       colorPicker.value = rgbToHex(point.getColor());
-      const x = point.x;
-      const y = point.y;
-      option.text = `Point (${x}, ${y})`;
+      option.text = `Point-${index + 1}`;
       pointDropdown.appendChild(option);
     });
   }
@@ -213,8 +210,8 @@ function main() {
         } else {
           const line = objects[objects.length - 1] as Line;
           line.setEndPoint(point);
-          sliderLength.value = '0';
-          sliderLengthValue.textContent = '0';
+          sliderLength.value = line.length.toString();
+          sliderLengthValue.textContent = line.length.toString();
           updatePointDropdown(line.id);
           line.render(gl, bufferPos, bufferCol);
           renderCanvas();
@@ -306,6 +303,7 @@ function main() {
   });
 
   const sideBar = document.getElementById('sidebar') as HTMLDivElement;
+  const sliderContainer = document.getElementById('slider-container') as HTMLDivElement;
   const sliderX = document.getElementById('slider-x') as HTMLInputElement;
   const sliderY = document.getElementById('slider-y') as HTMLInputElement;
   const sliderLength = document.getElementById('slider-length') as HTMLInputElement;
@@ -315,21 +313,21 @@ function main() {
   const pointDropdown = document.getElementById('point-dropdown') as HTMLSelectElement;
 
   const colorValue = document.getElementById('color-picker-value') as HTMLSpanElement;
-  
   const sliderXValue = document.getElementById('slider-x-value') as HTMLSpanElement;
   const sliderYValue = document.getElementById('slider-y-value') as HTMLSpanElement;
   const sliderLengthValue = document.getElementById('slider-length-value') as HTMLSpanElement;
   const sliderRotationValue = document.getElementById('slider-rotation-value') as HTMLSpanElement;
 
-  const sliderXPoint = document.getElementById('slider-x-point') as HTMLInputElement;
-  const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement;
-  const sliderYPoint = document.getElementById('slider-y-point') as HTMLInputElement;
-  const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement;
-
   const sliderPoint = document.getElementById('slider-point') as HTMLInputElement;
   const sliderPointValue = document.getElementById('slider-point-value') as HTMLSpanElement;
+  const sliderPointLabel = document.getElementById('slider-point-label') as HTMLLabelElement;
 
-  const sliderContainer = document.getElementById('slider-container') as HTMLDivElement;
+  const sliderXPoint = document.getElementById('slider-x-point') as HTMLInputElement;
+  const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement; 
+  const sliderXPointLabel = document.getElementById('slider-x-point-label') as HTMLLabelElement;
+  const sliderYPoint = document.getElementById('slider-y-point') as HTMLInputElement;
+  const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement;
+  const sliderYPointLabel = document.getElementById('slider-y-point-label') as HTMLLabelElement;
 
   // Event listener for dropdown selection changes
   document.getElementById('shape-dropdown')?.addEventListener('change', function () {
@@ -366,13 +364,15 @@ function main() {
     }
 
     if (objects[selectedShapeIndex].shapeType === ShapeType.POLYGON) {
-      // Update HTML for Polygon-specific sliders
-      sliderContainer.innerHTML = `
-          <label for="slider-x-point">Single point translation X: <span id="slider-x-point-value">0</span></label>
-          <input id="slider-x-point" type="range" min="0" max="${canvas.width}" step="1" value="0" />
-          <label for="slider-y-point">Single point translation Y: <span id="slider-y-point-value">0</span></label>
-          <input id="slider-y-point" type="range" min="0" max="${canvas.height}" step="1" value="0" />
-      `;
+      sliderXPoint.classList.remove('hidden')
+      sliderXPointValue.classList.remove('hidden')
+      sliderXPointLabel.classList.remove('hidden')
+      sliderYPoint.classList.remove('hidden')
+      sliderYPointValue.classList.remove('hidden')
+      sliderYPointLabel.classList.remove('hidden')
+      sliderPoint.classList.add('hidden')
+      sliderPointValue.classList.add('hidden')
+      sliderPointLabel.classList.add('hidden')
       sliderXPoint.setAttribute('min', (canvasWidth * -1).toString());
       sliderXPoint.setAttribute('max', canvasWidth.toString());
       sliderYPoint.setAttribute('min', (canvasHeight * -1).toString());
@@ -381,10 +381,15 @@ function main() {
       sliderYPointValue.textContent = '0';
     } else {
       // Default HTML for non-Polygon shapes
-      sliderContainer.innerHTML = `
-          <label for="slider-point">Single point slider: <span id="slider-point-value">0</span></label>
-          <input id="slider-point" type="range" min="0" max="${canvas.width}" step="1" value="0" />
-      `;
+      sliderXPoint.classList.add('hidden')
+      sliderXPointValue.classList.add('hidden')
+      sliderXPointLabel.classList.add('hidden')
+      sliderYPoint.classList.add('hidden')
+      sliderYPointValue.classList.add('hidden')
+      sliderYPointLabel.classList.add('hidden')
+      sliderPoint.classList.remove('hidden')
+      sliderPointValue.classList.remove('hidden')
+      sliderPointLabel.classList.remove('hidden')
       sliderPoint.setAttribute('min', '0');
       sliderPoint.setAttribute('max', '100');
       sliderPointValue.textContent = '0';
@@ -433,6 +438,17 @@ function main() {
     if (selectedShapeIndex !== null) {
       const selectedShape = objects[selectedShapeIndex];
       translate(selectedShape, selectedShape.tx, newY);
+      renderCanvas();
+    }
+  });
+
+  sliderPoint.addEventListener('input', function (e) {
+    sliderPointValue.textContent = this.value;
+    const xDif = parseFloat((e.target as HTMLInputElement).value);
+
+    if (selectedShapeIndex !== null) {
+      const selectedShape = objects[selectedShapeIndex];
+      // selectedShape.translate(newX,selectedShape.ty)
       renderCanvas();
     }
   });
