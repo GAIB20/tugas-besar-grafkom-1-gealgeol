@@ -88,6 +88,6 @@ WebGL adalah sebuah standar web  yang memungkinkan rendering grafis 2D dan 3D di
 2. Aplikasi dapat diakses pada `http://localhost:5173/` 
 
 ## Author
-13521056 - Daniel Egiant Sitanggang
-13521094 - Angela Livia Arumsari
-13521100 - Alexander Jason
+- 13521056 - Daniel Egiant Sitanggang
+- 13521094 - Angela Livia Arumsari
+- 13521100 - Alexander Jason
