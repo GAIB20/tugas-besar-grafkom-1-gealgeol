@@ -212,8 +212,8 @@ function main() {
         } else {
           const line = objects[objects.length - 1] as Line;
           line.setEndPoint(point);
-          sliderLength.value = '0';
-          sliderLengthValue.textContent = '0';
+          sliderLength.value = line.length.toString();
+          sliderLengthValue.textContent = line.length.toString();
           updatePointDropdown(line.id);
           line.render(gl, bufferPos, bufferCol);
           renderCanvas();
@@ -319,10 +319,8 @@ function main() {
   const sliderLengthValue = document.getElementById('slider-length-value') as HTMLSpanElement;
   const sliderRotationValue = document.getElementById('slider-rotation-value') as HTMLSpanElement;
 
-  const sliderXPoint = document.getElementById('slider-x-point') as HTMLInputElement;
-  const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement;
-  const sliderYPoint = document.getElementById('slider-y-point') as HTMLInputElement;
-  const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement;
+  const sliderPoint = document.getElementById('slider-point') as HTMLInputElement;
+  const sliderPointValue = document.getElementById('slider-point-value') as HTMLSpanElement;
 
   // Event listener for dropdown selection changes
   document.getElementById('shape-dropdown')?.addEventListener('change', function () {
@@ -334,8 +332,7 @@ function main() {
     sliderLength.value = '0';
     sliderRotation.value = '0';
 
-    sliderXPoint.value = '0';
-    sliderYPoint.value = '0';
+    sliderPoint.value = '0';
 
     const canvasWidth = Math.floor((canvas?.width || 0) / 2);
     const canvasHeight = Math.floor((canvas?.height || 0) / 2);
@@ -344,10 +341,8 @@ function main() {
     sliderY.setAttribute('min', (canvasHeight * -1).toString());
     sliderY.setAttribute('max', canvasHeight.toString());
 
-    sliderXPoint.setAttribute('min', (canvasWidth * -1).toString());
-    sliderXPoint.setAttribute('max', canvasWidth.toString());
-    sliderYPoint.setAttribute('min', (canvasHeight * -1).toString());
-    sliderYPoint.setAttribute('max', canvasHeight.toString());
+    sliderPoint.setAttribute('min', '0');
+    sliderPoint.setAttribute('max', '100');
 
     sliderLength.setAttribute('min', '1');
     sliderLength.setAttribute('max', canvasWidth.toString());
@@ -367,8 +362,7 @@ function main() {
     // Update slider value displays
     sliderXValue.textContent = '0';
     sliderYValue.textContent = '0';
-    sliderXPointValue.textContent = '0';
-    sliderYPointValue.textContent = '0';
+    sliderPointValue.textContent = '0';
 
     sliderRotationValue.textContent = '0';
   });
@@ -413,22 +407,13 @@ function main() {
     }
   });
 
-  sliderXPoint.addEventListener('input', function (e) {
-    sliderXPointValue.textContent = this.value;
+  sliderPoint.addEventListener('input', function (e) {
+    sliderPointValue.textContent = this.value;
     const xDif = parseFloat((e.target as HTMLInputElement).value);
 
     if (selectedShapeIndex !== null) {
       const selectedShape = objects[selectedShapeIndex];
       // selectedShape.translate(newX,selectedShape.ty)
-      renderCanvas();
-    }
-  });
-  sliderYPoint.addEventListener('input', function (e) {
-    sliderYPointValue.textContent = this.value;
-    const yDif = parseFloat((e.target as HTMLInputElement).value);
-    if (selectedShapeIndex !== null) {
-      const selectedShape = objects[selectedShapeIndex];
-      // selectedShape.translate(selectedShape.tx, newY);
       renderCanvas();
     }
   });
