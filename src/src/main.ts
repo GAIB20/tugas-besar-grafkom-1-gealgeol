@@ -252,6 +252,7 @@ function main() {
           updatePointDropdown(rectangle.id);
           renderCanvas();
           isDrawing = false;
+          rectangle.setupWidthLength();
         }
         break;
       case ShapeType.POLYGON:
@@ -362,6 +363,41 @@ function main() {
     } else {
       sliderLengthValue.textContent = '0';
     }
+
+    const sliderz = document.getElementById('slider-width-container') as HTMLDivElement;
+    if (objects[selectedShapeIndex].shapeType == ShapeType.RECTANGLE) {
+      sliderz.innerHTML = `
+          <label for="slider-width">Width: <span id="slider-width-value">0</span></label>
+          <input id="slider-width" type="range" min="1" max="${canvas.width}" step="1" value="0" />
+      `;
+    } else {
+      sliderz.innerHTML = ""
+    }
+
+
+
+    document.addEventListener("input", (e) => {
+      if (e.target === document.getElementById('slider-width') && objects[selectedShapeIndex!!].shapeType === ShapeType.RECTANGLE) {
+        const sliderWidth = e.target as HTMLInputElement;
+        (document.getElementById("slider-width-value") as HTMLSpanElement).textContent = sliderWidth.value;
+        const newWidth = parseFloat((e.target as HTMLInputElement).value);
+        const selectedShape = objects[selectedShapeIndex!!];
+        const rectangle = selectedShape as Rectangle;
+        rectangle.setWidth(newWidth);
+        scale(rectangle, rectangle.sx, rectangle.sy);
+        renderCanvas(); 
+      }
+      if (e.target === document.getElementById('slider-length') && objects[selectedShapeIndex!!].shapeType === ShapeType.RECTANGLE) {
+        const sliderLength = e.target as HTMLInputElement;
+        (document.getElementById("slider-length-value") as HTMLSpanElement).textContent = sliderLength.value;
+        const newLength = parseFloat((e.target as HTMLInputElement).value);
+        const selectedShape = objects[selectedShapeIndex!!];
+        const rectangle = selectedShape as Rectangle;
+        rectangle.setLength(newLength);
+        scale(rectangle, rectangle.sx, rectangle.sy);
+        renderCanvas(); 
+      }
+    });
 
     if (objects[selectedShapeIndex].shapeType === ShapeType.POLYGON) {
       // Update HTML for Polygon-specific sliders

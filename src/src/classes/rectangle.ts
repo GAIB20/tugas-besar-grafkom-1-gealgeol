@@ -7,6 +7,11 @@ export class Rectangle extends Shape {
     public firstRef: Point | null = null;
     public secondRef: Point | null = null;
 
+    public currLength: number = 0;
+    public currWidth: number = 0;
+    public length: number = 0;
+    public width: number = 0;
+
     public constructor(id: number, points: Point[]) {
         super(id, ShapeType.RECTANGLE);
         this.positions = points;
@@ -14,6 +19,24 @@ export class Rectangle extends Shape {
 
     public getPrimitiveType(gl: WebGLRenderingContext): number {
         return gl.TRIANGLE_FAN;
+    }
+
+    public setupWidthLength() {
+        this.length = Math.abs(this.firstRef!!.x - this.secondRef!!.x)
+        this.width = Math.abs(this.firstRef!!.y - this.secondRef!!.y)
+        this.currLength = this.length
+        this.currWidth = this.width
+        console.log(this.length, this.width, this.currLength, this.currWidth    )
+    }
+
+    public setLength(dLength: number) {
+        this.sx = (dLength + this.length)/this.currLength
+        this.currLength = dLength+this.length
+    }
+
+    public setWidth(dWidth: number) {
+        this.sy = (dWidth + this.width)/this.currWidth
+        this.currWidth = dWidth+this.width
     }
 
     public arrangePositions() {
