@@ -326,6 +326,11 @@ function main() {
   const sliderYPoint = document.getElementById('slider-y-point') as HTMLInputElement;
   const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement;
 
+  const sliderPoint = document.getElementById('slider-point') as HTMLInputElement;
+  const sliderPointValue = document.getElementById('slider-point-value') as HTMLSpanElement;
+
+  const sliderContainer = document.getElementById('slider-container') as HTMLDivElement;
+
   // Event listener for dropdown selection changes
   document.getElementById('shape-dropdown')?.addEventListener('change', function () {
     selectedShapeIndex = parseInt((this as HTMLSelectElement).value, 10);
@@ -336,8 +341,7 @@ function main() {
     sliderLength.value = '0';
     sliderRotation.value = '0';
 
-    sliderXPoint.value = '0';
-    sliderYPoint.value = '0';
+    sliderPoint.value = '0';
 
     const canvasWidth = Math.floor((canvas?.width || 0) / 2);
     const canvasHeight = Math.floor((canvas?.height || 0) / 2);
@@ -345,11 +349,6 @@ function main() {
     sliderX.setAttribute('max', canvasWidth.toString());
     sliderY.setAttribute('min', (canvasHeight * -1).toString());
     sliderY.setAttribute('max', canvasHeight.toString());
-
-    sliderXPoint.setAttribute('min', (canvasWidth * -1).toString());
-    sliderXPoint.setAttribute('max', canvasWidth.toString());
-    sliderYPoint.setAttribute('min', (canvasHeight * -1).toString());
-    sliderYPoint.setAttribute('max', canvasHeight.toString());
 
     sliderLength.setAttribute('min', '1');
     sliderLength.setAttribute('max', canvasWidth.toString());
@@ -366,12 +365,35 @@ function main() {
       sliderLengthValue.textContent = '0';
     }
 
+    if (objects[selectedShapeIndex].shapeType === ShapeType.POLYGON) {
+      // Update HTML for Polygon-specific sliders
+      sliderContainer.innerHTML = `
+          <label for="slider-x-point">Single point translation X: <span id="slider-x-point-value">0</span></label>
+          <input id="slider-x-point" type="range" min="0" max="${canvas.width}" step="1" value="0" />
+          <label for="slider-y-point">Single point translation Y: <span id="slider-y-point-value">0</span></label>
+          <input id="slider-y-point" type="range" min="0" max="${canvas.height}" step="1" value="0" />
+      `;
+      sliderXPoint.setAttribute('min', (canvasWidth * -1).toString());
+      sliderXPoint.setAttribute('max', canvasWidth.toString());
+      sliderYPoint.setAttribute('min', (canvasHeight * -1).toString());
+      sliderYPoint.setAttribute('max', canvasHeight.toString());
+      sliderXPointValue.textContent = '0';
+      sliderYPointValue.textContent = '0';
+    } else {
+      // Default HTML for non-Polygon shapes
+      sliderContainer.innerHTML = `
+          <label for="slider-point">Single point slider: <span id="slider-point-value">0</span></label>
+          <input id="slider-point" type="range" min="0" max="${canvas.width}" step="1" value="0" />
+      `;
+      sliderPoint.setAttribute('min', '0');
+      sliderPoint.setAttribute('max', '100');
+      sliderPointValue.textContent = '0';
+    }
+
     // Update slider value displays
     sliderXValue.textContent = '0';
     sliderYValue.textContent = '0';
-    sliderXPointValue.textContent = '0';
-    sliderYPointValue.textContent = '0';
-
+    
     sliderRotationValue.textContent = '0';
   });
 
@@ -455,7 +477,7 @@ function main() {
       pointWrapper.obj = new Point(sptPointXOld, sptPointYOld)
     }
      
-    selectedShape.singlePointTranslate(pointWrapper, sptPointXOld + xDif, sptPointYOld)
+    (selectedShape as Polygon).singlePointTranslate(pointWrapper, sptPointXOld + xDif, sptPointYOld)
     
     renderCanvas();
   }); 
@@ -466,8 +488,9 @@ function main() {
     if (selectedShapeIndex == null) return 
     const yDif = parseFloat((e.target as HTMLInputElement).value);
     const selectedShape = objects[selectedShapeIndex!!];  
-    const pointWrapper = new Wrapper(sptPointRef)
-    selectedShape.singlePointTranslate(pointWrapper, sptPointXOld, sptPointYOld + yDif)
+    // const pointWrapper = new Wrapper(sptPointRef)
+    
+    // (selectedShape as Polygon).singlePointTranslate(pointWrapper, sptPointXOld, sptPointYOld + yDif)
 
     console.log(sptPointRef.x, sptPointRef.y) 
     renderCanvas();
