@@ -260,16 +260,16 @@ function main() {
       case ShapeType.POLYGON:
         if (!isDrawing) {
           const polygon = new Polygon(objects.length, []);
-          polygon.references.push(point);
+          polygon.positions.push(point);
           polygon.arrangePositions();
           objects.push(polygon);
           updateShapeDropdown('Polygon');
           updatePointDropdown(polygon.id);
-          isDrawing = true;
+          isDrawing = true; 
           stopDrawingButton.classList.remove('hidden');
         } else {
           const polygon = objects[objects.length - 1] as Polygon;
-          polygon.references.push(point);
+          polygon.positions.push(point);
           polygon.arrangePositions();
           updatePointDropdown(polygon.id);
           polygon.render(gl, bufferPos, bufferCol);
@@ -321,11 +321,6 @@ function main() {
   const sliderLengthValue = document.getElementById('slider-length-value') as HTMLSpanElement;
   const sliderRotationValue = document.getElementById('slider-rotation-value') as HTMLSpanElement;
 
-  const sliderXPoint = document.getElementById('slider-x-point') as HTMLInputElement;
-  const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement;
-  const sliderYPoint = document.getElementById('slider-y-point') as HTMLInputElement;
-  const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement;
-
   const sliderPoint = document.getElementById('slider-point') as HTMLInputElement;
   const sliderPointValue = document.getElementById('slider-point-value') as HTMLSpanElement;
 
@@ -373,6 +368,12 @@ function main() {
           <label for="slider-y-point">Single point translation Y: <span id="slider-y-point-value">0</span></label>
           <input id="slider-y-point" type="range" min="0" max="${canvas.height}" step="1" value="0" />
       `;
+
+      const sliderXPoint = document.getElementById('slider-x-point') as HTMLInputElement;
+      const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement;
+      const sliderYPoint = document.getElementById('slider-y-point') as HTMLInputElement;
+      const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement;
+
       sliderXPoint.setAttribute('min', (canvasWidth * -1).toString());
       sliderXPoint.setAttribute('max', canvasWidth.toString());
       sliderYPoint.setAttribute('min', (canvasHeight * -1).toString());
@@ -416,6 +417,7 @@ function main() {
     renderCanvas();
   });
 
+  
   // Slider
   sliderX.addEventListener('input', function (e) {
     sliderXValue.textContent = this.value;
@@ -438,14 +440,12 @@ function main() {
   });
 
   function getSelectedPoint() {
+    const polygon = objects[selectedShapeIndex!!] as Polygon;
     const dropdown = document.getElementById('point-dropdown') as HTMLSelectElement;
-    const selectedOption = dropdown.options[dropdown.selectedIndex];
-    const pointStr = selectedOption.value;
-    const numbersArray = pointStr.split(',');
-
-    const x = parseFloat(numbersArray[0].trim());
-    const y = parseFloat(numbersArray[1].trim());      
-    return new Point(x, y);
+    const pointIndex = parseInt(dropdown.options[dropdown.selectedIndex].value, 10);
+    const selectedPoint = polygon.getPoints()[pointIndex];
+          
+    return new Point(selectedPoint.x, selectedPoint.y);
   }
 
   var sptPointRef: Point;
@@ -466,35 +466,72 @@ function main() {
     // sptPointRef = objects[selectedShapeIndex!!].positions 
   })
 
-  sliderXPoint.addEventListener('input', function (e) {
-    sliderXPointValue.textContent = this.value;
-    if (!spt) return 
-    if (selectedShapeIndex == null) return 
-    const xDif = parseFloat((e.target as HTMLInputElement).value);
-    const selectedShape = objects[selectedShapeIndex!!];  
-    const pointWrapper = new Wrapper(sptPointRef)
-    if (selectedShape instanceof Rectangle) {
-      pointWrapper.obj = new Point(sptPointXOld, sptPointYOld)
+  document.addEventListener('input', (e) => {
+    if ((e.target as HTMLInputElement).id == "slider-x-point") {
+      const sliderXPoint = e.target as HTMLInputElement;
+      (document.getElementById("slider-x-point-value") as HTMLSpanElement).textContent = sliderXPoint.value;
+      if (!spt) return 
+      if (selectedShapeIndex == null) return 
+  
+      const xDif = parseFloat((e.target as HTMLInputElement).value);
+      const selectedShape = objects[selectedShapeIndex!!];  
+      const pointWrapper = new Wrapper(sptPointRef)
+  
+      if (selectedShape instanceof Rectangle) {
+        pointWrapper.obj = new Point(sptPointXOld, sptPointYOld)
+      }
+       
+      (selectedShape as Polygon).singlePointTranslate(pointWrapper, sptPointXOld + xDif, sptPointYOld)
+      
+      renderCanvas();
+  
     }
-     
-    (selectedShape as Polygon).singlePointTranslate(pointWrapper, sptPointXOld + xDif, sptPointYOld)
-    
-    renderCanvas();
-  }); 
+  })
 
-  sliderYPoint.addEventListener('input', function (e) {
-    sliderYPointValue.textContent = this.value;
-    if (!spt) return 
-    if (selectedShapeIndex == null) return 
-    const yDif = parseFloat((e.target as HTMLInputElement).value);
-    const selectedShape = objects[selectedShapeIndex!!];  
-    // const pointWrapper = new Wrapper(sptPointRef)
-    
-    // (selectedShape as Polygon).singlePointTranslate(pointWrapper, sptPointXOld, sptPointYOld + yDif)
+  document.addEventListener('input', (e) => {
+    if ((e.target as HTMLInputElement).id == "slider-x-point") {
+      const sliderXPoint = e.target as HTMLInputElement;
+      (document.getElementById("slider-x-point-value") as HTMLSpanElement).textContent = sliderXPoint.value;
+      if (!spt) return 
+      if (selectedShapeIndex == null) return 
+  
+      const xDif = parseFloat((e.target as HTMLInputElement).value);
+      const selectedShape = objects[selectedShapeIndex!!];  
+      const pointWrapper = new Wrapper(sptPointRef)
+  
+      if (selectedShape instanceof Rectangle) {
+        pointWrapper.obj = new Point(sptPointXOld, sptPointYOld)
+      }
+       
+      (selectedShape as Polygon).singlePointTranslate(pointWrapper, sptPointXOld + xDif, sptPointYOld)
+      
+      renderCanvas();
+    }
 
-    console.log(sptPointRef.x, sptPointRef.y) 
-    renderCanvas();
-  });
+    if ((e.target as HTMLInputElement).id == "slider-y-point") {
+      const sliderXPoint = e.target as HTMLInputElement;
+      (document.getElementById("slider-y-point-value") as HTMLSpanElement).textContent = sliderXPoint.value;
+      if (!spt) return 
+      if (selectedShapeIndex == null) return 
+  
+      const yDif = parseFloat((e.target as HTMLInputElement).value);
+      const selectedShape = objects[selectedShapeIndex!!];  
+      const pointWrapper = new Wrapper(sptPointRef)
+  
+      if (selectedShape instanceof Rectangle) {
+        pointWrapper.obj = new Point(sptPointXOld, sptPointYOld)
+      }
+       
+      (selectedShape as Polygon).singlePointTranslate(pointWrapper, sptPointXOld, sptPointYOld + yDif)
+      
+      renderCanvas();
+    }
+  })
+
+
+
+
+
 
   sliderLength.addEventListener('input', function (e) {
     sliderLengthValue.textContent = this.value;
@@ -529,21 +566,17 @@ function main() {
     if (selectedShapeIndex !== null && objects[selectedShapeIndex!!].shapeType === ShapeType.POLYGON) {
       const polygon = objects[selectedShapeIndex!!] as Polygon;
       const dropdown = document.getElementById('point-dropdown') as HTMLSelectElement;
-      const selectedOption = dropdown.options[dropdown.selectedIndex];
-      const pointStr = selectedOption.value;
-      const numbersArray = pointStr.split(',');
+      const pointIndex = parseInt(dropdown.options[dropdown.selectedIndex].value, 10);
+      const selectedPoint = polygon.getPoints()[pointIndex];
+      console.log(selectedPoint)
 
-      const x = parseFloat(numbersArray[0].trim());
-      const y = parseFloat(numbersArray[1].trim());
-
-      polygon.deletePoint(new Point(x, y));
+      polygon.deletePoint(selectedPoint);
       renderCanvas();
       updatePointDropdown(selectedShapeIndex!!);
     } else {
       alert('Only polygon point can be deleted!');
     }
   });
-
   let animateFlag = false;
   let lastTime = 0;
     const anglePerSecond = 30; 
