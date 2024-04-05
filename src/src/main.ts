@@ -112,33 +112,6 @@ function main() {
     });
   }
 
-  //   function animateRotation(shape: Shape, targetDegree: number, duration: number) {
-  //     const startTime = performance.now();
-  //     const startDegree = shape.degree;
-  //     let degreeChange = targetDegree - startDegree;
-
-  //     if (degreeChange > 180) degreeChange -= 360;
-  //     if (degreeChange < -180) degreeChange += 360;
-
-  //     const animate = (currentTime: number) => {
-  //         const elapsedTime = currentTime - startTime;
-  //         const fraction = elapsedTime / duration;
-
-  //         // Ensure the animation stops at the exact targetDegree after duration
-  //         if (fraction >= 1) {
-  //             rotate(shape, targetDegree);
-  //             shape.degree = targetDegree; // Ensure final degree is set accurately
-  //         } else {
-  //             const currentDegree = startDegree + degreeChange * fraction;
-  //             rotate(shape, currentDegree);
-  //             shape.degree = currentDegree; // Update degree for intermediate steps
-  //             requestAnimationFrame(animate);
-  //         }
-  //     };
-
-  //     requestAnimationFrame(animate);
-  // }
-
   const lineBtn = document.getElementById('line-btn') as HTMLButtonElement;
   const squareBtn = document.getElementById('square-btn') as HTMLButtonElement;
   const rectangleBtn = document.getElementById('rectangle-btn') as HTMLButtonElement;
@@ -239,7 +212,6 @@ function main() {
         } else {
           const line = objects[objects.length - 1] as Line;
           line.setEndPoint(point);
-          console.log(line.length);
           sliderLength.value = '0';
           sliderLengthValue.textContent = '0';
           updatePointDropdown(line.id);
@@ -405,7 +377,6 @@ function main() {
   document.getElementById('point-dropdown')?.addEventListener('change', function () {
     selectedPointIndex = parseInt((this as HTMLSelectElement).value, 10);
     selectedShapeIndex = parseInt((document.getElementById('shape-dropdown') as HTMLSelectElement).value, 10);
-    console.log('hai', selectedPointIndex);
     const color = rgbToHex(objects[selectedShapeIndex].getPoints()[selectedPointIndex].getColor());
     colorPicker.value = color;
     colorValue.textContent = color;
@@ -418,7 +389,6 @@ function main() {
     colorValue.textContent = hex;
     colorPicker.value = hex;
     objects[selectedShapeIndex].getPoints()[selectedPointIndex].setColor(hexToRgb(hex));
-    console.log('tes', objects[selectedShapeIndex].getPoints()[selectedPointIndex].getColor());
     renderCanvas();
   });
 
