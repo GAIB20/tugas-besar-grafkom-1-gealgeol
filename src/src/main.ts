@@ -101,13 +101,10 @@ function main() {
     const points = objects[objId].positions;
     points.map((point, index) => {
       const option = document.createElement('option');
-      option.value = point.x.toString() + ',' + point.y.toString();
       option.value = index.toString();
       colorValue.textContent = rgbToHex(point.getColor());
       colorPicker.value = rgbToHex(point.getColor());
-      const x = point.x;
-      const y = point.y;
-      option.text = `Point (${x}, ${y})`;
+      option.text = `Point-${index + 1}`;
       pointDropdown.appendChild(option);
     });
   }
@@ -305,6 +302,7 @@ function main() {
   });
 
   const sideBar = document.getElementById('sidebar') as HTMLDivElement;
+  const sliderContainer = document.getElementById('slider-container') as HTMLDivElement;
   const sliderX = document.getElementById('slider-x') as HTMLInputElement;
   const sliderY = document.getElementById('slider-y') as HTMLInputElement;
   const sliderLength = document.getElementById('slider-length') as HTMLInputElement;
@@ -321,6 +319,12 @@ function main() {
 
   const sliderPoint = document.getElementById('slider-point') as HTMLInputElement;
   const sliderPointValue = document.getElementById('slider-point-value') as HTMLSpanElement;
+
+  const sliderXPoint = document.getElementById('slider-x-point') as HTMLInputElement;
+  const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement;
+  const sliderYPoint = document.getElementById('slider-y-point') as HTMLInputElement;
+  const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement;
+
 
   // Event listener for dropdown selection changes
   document.getElementById('shape-dropdown')?.addEventListener('change', function () {
@@ -341,9 +345,6 @@ function main() {
     sliderY.setAttribute('min', (canvasHeight * -1).toString());
     sliderY.setAttribute('max', canvasHeight.toString());
 
-    sliderPoint.setAttribute('min', '0');
-    sliderPoint.setAttribute('max', '100');
-
     sliderLength.setAttribute('min', '1');
     sliderLength.setAttribute('max', canvasWidth.toString());
 
@@ -359,11 +360,35 @@ function main() {
       sliderLengthValue.textContent = '0';
     }
 
+    if (objects[selectedShapeIndex].shapeType === ShapeType.POLYGON) {
+      // Update HTML for Polygon-specific sliders
+      sliderContainer.innerHTML = `
+          <label for="slider-x-point">Single point translation X: <span id="slider-x-point-value">0</span></label>
+          <input id="slider-x-point" type="range" min="0" max="${canvas.width}" step="1" value="0" />
+          <label for="slider-y-point">Single point translation Y: <span id="slider-y-point-value">0</span></label>
+          <input id="slider-y-point" type="range" min="0" max="${canvas.height}" step="1" value="0" />
+      `;
+      sliderXPoint.setAttribute('min', (canvasWidth * -1).toString());
+      sliderXPoint.setAttribute('max', canvasWidth.toString());
+      sliderYPoint.setAttribute('min', (canvasHeight * -1).toString());
+      sliderYPoint.setAttribute('max', canvasHeight.toString());
+      sliderXPointValue.textContent = '0';
+      sliderYPointValue.textContent = '0';
+    } else {
+      // Default HTML for non-Polygon shapes
+      sliderContainer.innerHTML = `
+          <label for="slider-point">Single point slider: <span id="slider-point-value">0</span></label>
+          <input id="slider-point" type="range" min="0" max="${canvas.width}" step="1" value="0" />
+      `;
+      sliderPoint.setAttribute('min', '0');
+      sliderPoint.setAttribute('max', '100');
+      sliderPointValue.textContent = '0';
+    }
+
     // Update slider value displays
     sliderXValue.textContent = '0';
     sliderYValue.textContent = '0';
-    sliderPointValue.textContent = '0';
-
+    
     sliderRotationValue.textContent = '0';
   });
 
@@ -451,14 +476,11 @@ function main() {
     if (selectedShapeIndex !== null && objects[selectedShapeIndex!!].shapeType === ShapeType.POLYGON) {
       const polygon = objects[selectedShapeIndex!!] as Polygon;
       const dropdown = document.getElementById('point-dropdown') as HTMLSelectElement;
-      const selectedOption = dropdown.options[dropdown.selectedIndex];
-      const pointStr = selectedOption.value;
-      const numbersArray = pointStr.split(',');
+      const pointIndex = parseInt(dropdown.options[dropdown.selectedIndex].value, 10);
+      const selectedPoint = polygon.getPoints()[pointIndex];
+      console.log(selectedPoint)
 
-      const x = parseFloat(numbersArray[0].trim());
-      const y = parseFloat(numbersArray[1].trim());
-
-      polygon.deletePoint(new Point(x, y));
+      polygon.deletePoint(selectedPoint);
       renderCanvas();
       updatePointDropdown(selectedShapeIndex!!);
     } else {

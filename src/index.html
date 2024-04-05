@@ -43,8 +43,10 @@
                 <label for="point-dropdown">Point:</label>
                 <select id="point-dropdown" class="text-black"></select>
 
-                <label for="slider-point">Single point slider: <span id="slider-point-value">0</span></label>
-                <input id="slider-point" type="range" min="0" max="canvas.width" step="1" value="0" />
+                <div id="slider-container">
+                    <label for="slider-point">Single point slider: <span id="slider-point-value">0</span></label>
+                    <input id="slider-point" type="range" min="0" max="canvas.width" step="1" value="0" />
+                </div>
 
                 <div class="grid grid-cols-2 text-white font-medium gap-2">
                     <button id="save-point-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Save SPT</button>
