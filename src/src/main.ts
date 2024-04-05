@@ -236,7 +236,7 @@ function main() {
       case ShapeType.POLYGON:
         if (!isDrawing) {
           const polygon = new Polygon(objects.length, []);
-          polygon.references.push(point);
+          polygon.positions.push(point);
           polygon.arrangePositions();
           objects.push(polygon);
           updateShapeDropdown('Polygon');
@@ -245,7 +245,7 @@ function main() {
           stopDrawingButton.classList.remove('hidden');
         } else {
           const polygon = objects[objects.length - 1] as Polygon;
-          polygon.references.push(point);
+          polygon.positions.push(point);
           polygon.arrangePositions();
           updatePointDropdown(polygon.id);
           polygon.render(gl, bufferPos, bufferCol);

@@ -5,7 +5,7 @@ import { Point } from "./point";
 import { Shape } from "./shape";
 
 export class Polygon extends Shape {
-    public references: Point[] = []
+    // public references: Point[] = []
     public constructor(id: number, points: Point[]) {
         super(id, ShapeType.POLYGON);
         this.positions = points;
@@ -16,9 +16,10 @@ export class Polygon extends Shape {
     }
     
     public arrangePositions() {
-        if (this.references.length < 3) return
+        if (this.positions.length < 3) return
 
-        this.positions = convexHull(this.references)
+        this.positions = convexHull(this.positions)
+        // this.references = this.positions
     }
 
     public deletePoint(point: Point) {
@@ -26,13 +27,13 @@ export class Polygon extends Shape {
             alert("Cannot delete point from polygon with <= 3 points.")
             return
         }
-        this.references = this.references.filter((p) => !(p.x === point.x && p.y === point.y))
+        this.positions = this.positions.filter((p) => !(p.x === point.x && p.y === point.y))
         this.arrangePositions()
     }
 
     public singlePointTranslate(oldPoint: Wrapper, x: number, y: number): void {
         const oldPointObj = oldPoint.obj as Point
-        const point = this.references.find(point => point === oldPointObj)!!
+        const point = this.positions.find(point => point === oldPointObj)!!
         point.x = x 
         point.y = y
         this.arrangePositions()
