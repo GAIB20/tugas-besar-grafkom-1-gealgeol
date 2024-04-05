@@ -323,7 +323,7 @@ function main() {
   const sliderPointLabel = document.getElementById('slider-point-label') as HTMLLabelElement;
 
   const sliderXPoint = document.getElementById('slider-x-point') as HTMLInputElement;
-  const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement; 
+  const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement;
   const sliderXPointLabel = document.getElementById('slider-x-point-label') as HTMLLabelElement;
   const sliderYPoint = document.getElementById('slider-y-point') as HTMLInputElement;
   const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement;
@@ -444,12 +444,18 @@ function main() {
 
   sliderPoint.addEventListener('input', function (e) {
     sliderPointValue.textContent = this.value;
-    const xDif = parseFloat((e.target as HTMLInputElement).value);
+    const lengthDif = parseFloat((e.target as HTMLInputElement).value);
+    selectedPointIndex = parseInt((document.getElementById('point-dropdown') as HTMLSelectElement).value, 10);
 
-    if (selectedShapeIndex !== null) {
-      const selectedShape = objects[selectedShapeIndex];
-      // selectedShape.translate(newX,selectedShape.ty)
-      renderCanvas();
+    if (selectedShapeIndex !== null && selectedPointIndex !== null) {
+      if (objects[selectedShapeIndex].shapeType == ShapeType.SQUARE) {
+        const square = objects[selectedShapeIndex] as Square;
+        square.movePoint(lengthDif, selectedPointIndex)
+      } else if (objects[selectedShapeIndex].shapeType == ShapeType.LINE) {
+        const line = objects[selectedShapeIndex] as Line;
+        line.movePoint(lengthDif, selectedPointIndex)
+      }
+      renderCanvas()
     }
   });
 
@@ -522,9 +528,8 @@ function main() {
         square.updateLength(newLength);
       } else if (objects[selectedShapeIndex].shapeType == ShapeType.LINE) {
         const line = objects[selectedShapeIndex] as Line;
-        line.setLength(newLength);
+        line.updateLength(newLength);
         scale(line, line.sx, line.sy);
-        renderCanvas();
       }
       renderCanvas();
     }

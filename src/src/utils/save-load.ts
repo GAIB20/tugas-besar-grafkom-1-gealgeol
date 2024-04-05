@@ -47,12 +47,15 @@ interface ShapeObject {
   id: number;
   shapeType: string;
   positions: Point[];
+  oriPositions?: Point[];
   "tx": number,
   "ty": number,
   "degree": number,
   "sx": number,
   "sy": number,
+  diagonal?:number,
   length?: number,
+  oriLength?: number,
   center?: Point;
   references?: Point[];
   secondRef?: Point | null;
@@ -67,11 +70,14 @@ const objectToShape = (objects: ShapeObject[]): Shape[] => {
       let line = new Line(object.id, objectToPoint(object.positions[0]));
       line.positions = objectsToPoints(object.positions);
       line.length = object.length!
+      line.oriLength = object.oriLength!;
       shapes.push(line);
     } else if (object.shapeType == 'Square') {
       let square = new Square(object.id, objectToPoint(object.center!));
       square.positions = objectsToPoints(object.positions);
       square.length = object.length!
+      square.diagonal = object.diagonal!
+      square.oriPositions = object.oriPositions!
       shapes.push(square);
     } else if (object.shapeType == 'Rectangle') {
       let rectangle = new Rectangle(object.id, objectsToPoints(object.positions));

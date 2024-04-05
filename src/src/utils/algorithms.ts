@@ -36,3 +36,18 @@ export function convexHull(points: Point[]): Point[] {
 
     return hull;
 }
+
+export function copyArrayOfPoints(originalArray: Point[]): Point[] {
+    let newArray: Point[] = [];
+    for (let point of originalArray) {
+        let newPoint: Point = new Point(point.x, point.y);
+        newPoint.color = {
+            r: point.color.r,
+            g: point.color.g,
+            b: point.color.b,
+            a: point.color.a,
+        }
+        newArray.push(newPoint);
+    }
+    return newArray;
+}
