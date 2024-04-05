@@ -16,7 +16,54 @@ WebGL adalah sebuah standar web  yang memungkinkan rendering grafis 2D dan 3D di
 
 ## Struktur Program
 
-```.    
+```
+ª   .gitignore
+ª   README.md
+ª   tes.txt
+ª   
++---doc
+ª       Tubes1_IF3260_13521056_13521094_13521100.pdf
+ª       
++---src
+ª   +---src
+ª       ª   main copy.ts
+ª       ª   main.ts
+ª       ª   style.css
+ª       ª   vite-env.d.ts
+ª       ª   
+ª       +---classes
+ª       ª       line.ts
+ª       ª       matrix.ts
+ª       ª       point.ts
+ª       ª       polygon.ts
+ª       ª       rectangle.ts
+ª       ª       shape.ts
+ª       ª       square.ts
+ª       ª       vector.ts
+ª       ª       
+ª       +---enum
+ª       ª       shape-type.ts
+ª       ª       
+ª       +---interfaces
+ª       ª       color.ts
+ª       ª       
+ª       +---shaders
+ª       ª       fragment-shader.ts
+ª       ª       vertex-shader.ts
+ª       ª       
+ª       +---utils
+ª               algorithms.ts
+ª               animation.ts
+ª               save-load.ts
+ª               tools.ts
+ª               transformations.ts
+ª               web-gl.ts
+ª               wrapper.ts
+ª               
++---test
+        model1.json
+        model2.json
+            
 ```
 
 ## Fitur Program
@@ -39,3 +86,8 @@ WebGL adalah sebuah standar web  yang memungkinkan rendering grafis 2D dan 3D di
 
 1. Jalankan perintah `pnpm run dev` untuk menjalankan aplikasi pada port 5173
 2. Aplikasi dapat diakses pada `http://localhost:5173/` 
+
+## Author
+13521056 - Daniel Egiant Sitanggang
+13521094 - Angela Livia Arumsari
+13521100 - Alexander Jason
