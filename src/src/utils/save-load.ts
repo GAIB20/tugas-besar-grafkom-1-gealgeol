@@ -47,6 +47,12 @@ interface ShapeObject {
   id: number;
   shapeType: string;
   positions: Point[];
+  "tx": number,
+  "ty": number,
+  "degree": number,
+  "sx": number,
+  "sy": number,
+  length?: number,
   center?: Point;
   references?: Point[];
   secondRef?: Point | null;
@@ -60,10 +66,12 @@ const objectToShape = (objects: ShapeObject[]): Shape[] => {
     if (object.shapeType == 'Line') {
       let line = new Line(object.id, objectToPoint(object.positions[0]));
       line.positions = objectsToPoints(object.positions);
+      line.length = object.length!
       shapes.push(line);
     } else if (object.shapeType == 'Square') {
       let square = new Square(object.id, objectToPoint(object.center!));
       square.positions = objectsToPoints(object.positions);
+      square.length = object.length!
       shapes.push(square);
     } else if (object.shapeType == 'Rectangle') {
       let rectangle = new Rectangle(object.id, objectsToPoints(object.positions));

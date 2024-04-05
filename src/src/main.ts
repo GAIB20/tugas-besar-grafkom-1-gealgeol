@@ -11,6 +11,8 @@ import { Polygon } from './classes/polygon.ts';
 import { Square } from './classes/square.ts';
 import { loadFile } from './utils/save-load.ts';
 import { Wrapper } from './utils/wrapper.ts';
+import { hexToRgb, rgbToHex } from './utils/tools.ts';
+import { rotate, scale, translate } from './utils/transformations.ts';
 
 function main() {
   // Create WebGL program
@@ -25,7 +27,6 @@ function main() {
 
   let vertexShader = createShader(gl, gl.VERTEX_SHADER, VertexShaderSource);
   let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, FragmentShaderSource);
-  let selectedShapeIndex: number | null = null;
 
   if (!vertexShader || !fragmentShader) {
     return;
@@ -72,6 +73,8 @@ function main() {
   let isDrawing = false;
   let objects: Shape[] = [];
   let activeShape: ShapeType = ShapeType.LINE;
+  let selectedShapeIndex: number | null = null;
+  let selectedPointIndex: number | null = null;
 
   const renderCanvas = () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -84,52 +87,52 @@ function main() {
     window.requestAnimationFrame(renderCanvas);
   };
 
-  const lineBtn = document.getElementById('line-btn') as HTMLButtonElement
-  const squareBtn = document.getElementById('square-btn') as HTMLButtonElement
-  const rectangleBtn = document.getElementById('rectangle-btn') as HTMLButtonElement
-  const polygonBtn = document.getElementById('polygon-btn') as HTMLButtonElement
+  const lineBtn = document.getElementById('line-btn') as HTMLButtonElement;
+  const squareBtn = document.getElementById('square-btn') as HTMLButtonElement;
+  const rectangleBtn = document.getElementById('rectangle-btn') as HTMLButtonElement;
+  const polygonBtn = document.getElementById('polygon-btn') as HTMLButtonElement;
 
   document.querySelector('#line-btn')?.addEventListener('click', () => {
     activeShape = ShapeType.LINE;
-    lineBtn.classList.remove('bg-blue-950', 'text-white')
-    lineBtn.classList.add('text-blue-950', 'bg-white')
+    lineBtn.classList.remove('bg-blue-950', 'text-white');
+    lineBtn.classList.add('text-blue-950', 'bg-white');
 
-    squareBtn.classList.remove('bg-white', 'text-blue-950')
-    rectangleBtn.classList.remove('bg-white', 'text-blue-950')
-    polygonBtn.classList.remove('bg-white', 'text-blue-950')
+    squareBtn.classList.remove('bg-white', 'text-blue-950');
+    rectangleBtn.classList.remove('bg-white', 'text-blue-950');
+    polygonBtn.classList.remove('bg-white', 'text-blue-950');
   });
 
   document.querySelector('#square-btn')?.addEventListener('click', () => {
     activeShape = ShapeType.SQUARE;
-    squareBtn.classList.remove('bg-blue-950', 'text-white')
-    squareBtn.classList.add('text-blue-950', 'bg-white')
+    squareBtn.classList.remove('bg-blue-950', 'text-white');
+    squareBtn.classList.add('text-blue-950', 'bg-white');
 
-    lineBtn.classList.remove('bg-white', 'text-blue-950')
-    rectangleBtn.classList.remove('bg-white', 'text-blue-950')
-    polygonBtn.classList.remove('bg-white', 'text-blue-950')
+    lineBtn.classList.remove('bg-white', 'text-blue-950');
+    rectangleBtn.classList.remove('bg-white', 'text-blue-950');
+    polygonBtn.classList.remove('bg-white', 'text-blue-950');
   });
 
   document.querySelector('#rectangle-btn')?.addEventListener('click', () => {
     activeShape = ShapeType.RECTANGLE;
-    rectangleBtn.classList.remove('bg-blue-950', 'text-white')
-    rectangleBtn.classList.add('text-blue-950', 'bg-white')
+    rectangleBtn.classList.remove('bg-blue-950', 'text-white');
+    rectangleBtn.classList.add('text-blue-950', 'bg-white');
 
-    lineBtn.classList.remove('bg-white', 'text-blue-950')
-    squareBtn.classList.remove('bg-white', 'text-blue-950')
-    polygonBtn.classList.remove('bg-white', 'text-blue-950')
+    lineBtn.classList.remove('bg-white', 'text-blue-950');
+    squareBtn.classList.remove('bg-white', 'text-blue-950');
+    polygonBtn.classList.remove('bg-white', 'text-blue-950');
   });
 
   document.querySelector('#polygon-btn')?.addEventListener('click', () => {
     activeShape = ShapeType.POLYGON;
-    polygonBtn.classList.remove('bg-blue-950', 'text-white')
-    polygonBtn.classList.add('text-blue-950', 'bg-white')
+    polygonBtn.classList.remove('bg-blue-950', 'text-white');
+    polygonBtn.classList.add('text-blue-950', 'bg-white');
 
-    lineBtn.classList.remove('bg-white', 'text-blue-950')
-    squareBtn.classList.remove('bg-white', 'text-blue-950')
-    rectangleBtn.classList.remove('bg-white', 'text-blue-950')
+    lineBtn.classList.remove('bg-white', 'text-blue-950');
+    squareBtn.classList.remove('bg-white', 'text-blue-950');
+    rectangleBtn.classList.remove('bg-white', 'text-blue-950');
   });
 
-  document.querySelector('#save-btn')?.addEventListener('click', function() {
+  document.querySelector('#save-btn')?.addEventListener('click', function () {
     let jsonData = JSON.stringify(objects, null, 2);
     let blob = new Blob([jsonData], { type: 'application/json' });
 
@@ -146,17 +149,29 @@ function main() {
   });
 
   document.querySelector('#load-btn')?.addEventListener('click', () => {
-    loadFile().then((shapes) => objects = shapes);
-    renderCanvas();
+    objects = []
+    shapeDropdown.innerHTML = ''
+    pointDropdown.innerHTML = ''
+    renderCanvas()
+    loadFile().then(shapes => {
+      objects = shapes
+      renderCanvas();
+      for (let object of objects) {
+        updateShapeDropdown(object.shapeType);
+        updatePointDropdown(object.id);
+      }
+      const fileInput = document.getElementById("file-input") as HTMLInputElement
+      fileInput.value = "";
+    });
   });
 
-  const stopDrawingButton = document.querySelector("#stop-drawing-btn")!!
-  stopDrawingButton.addEventListener("click", () => {
-    isDrawing = false
-    stopDrawingButton.classList.add("hidden")
-  })
+  const stopDrawingButton = document.querySelector('#stop-drawing-btn')!!;
+  stopDrawingButton.addEventListener('click', () => {
+    isDrawing = false;
+    stopDrawingButton.classList.add('hidden');
+  });
 
-  canvas.addEventListener('mousedown', (e) => {
+  canvas.addEventListener('mousedown', e => {
     const x = e.offsetX;
     const y = canvas.height - e.offsetY;
     const point = new Point(x, y);
@@ -172,6 +187,9 @@ function main() {
         } else {
           const line = objects[objects.length - 1] as Line;
           line.setEndPoint(point);
+          console.log(line.length)
+          sliderLength.value = "0";
+          sliderLengthValue.textContent = "0"
           updatePointDropdown(line.id);
           line.render(gl, bufferPos, bufferCol);
           renderCanvas();
@@ -188,6 +206,8 @@ function main() {
         } else {
           const square = objects[objects.length - 1] as Square;
           square.updatePoint(point);
+          sliderLength.value = square.length.toString();
+          sliderLengthValue.textContent = square.length.toString()
           updatePointDropdown(square.id);
           square.render(gl, bufferPos, bufferCol);
           renderCanvas();
@@ -198,7 +218,7 @@ function main() {
         if (!isDrawing) {
           const rectangle = new Rectangle(objects.length, []);
           rectangle.firstRef = point;
-          objects.push(rectangle); 
+          objects.push(rectangle);
           updateShapeDropdown('Rectangle');
           updatePointDropdown(rectangle.id);
           isDrawing = true;
@@ -217,11 +237,11 @@ function main() {
           const polygon = new Polygon(objects.length, []);
           polygon.references.push(point);
           polygon.arrangePositions();
-          objects.push(polygon); 
+          objects.push(polygon);
           updateShapeDropdown('Polygon');
           updatePointDropdown(polygon.id);
           isDrawing = true;
-          stopDrawingButton.classList.remove("hidden")
+          stopDrawingButton.classList.remove('hidden');
         } else {
           const polygon = objects[objects.length - 1] as Polygon;
           polygon.references.push(point);
@@ -235,7 +255,7 @@ function main() {
     
   });
 
-  canvas.addEventListener('mousemove', (e) => {
+  canvas.addEventListener('mousemove', e => {
     const x = e.offsetX;
     const y = canvas.height - e.offsetY;
     const point = new Point(x, y);
@@ -246,13 +266,11 @@ function main() {
           line.setEndPoint(point);
           line.render(gl, bufferPos, bufferCol);
           break;
-
         case ShapeType.SQUARE:
           const square: Square = objects[objects.length - 1] as Square;
           square.updatePoint(point);
           square.render(gl, bufferPos, bufferCol);
           break;
-
         case ShapeType.RECTANGLE:
           const rectangle = objects[objects.length - 1] as Rectangle;
           rectangle.secondRef = point;
@@ -264,12 +282,11 @@ function main() {
   });
 
   function updateShapeDropdown(objName: string) {
-    const dropdown = document.getElementById('shape-dropdown') as HTMLSelectElement;
     const option = document.createElement('option');
-    option.value = dropdown.options.length.toString(); // Assigning the value based on the length of existing options
-    option.text = `${objName}-${dropdown.options.length + 1}`; // Generating text based on the length of existing options
-    dropdown.appendChild(option);
-    dropdown.selectedIndex = dropdown.options.length - 1;
+    option.value = shapeDropdown.options.length.toString(); // Assigning the value based on the length of existing options
+    option.text = `${objName}-${shapeDropdown.options.length + 1}`; // Generating text based on the length of existing options
+    shapeDropdown.appendChild(option);
+    shapeDropdown.selectedIndex = shapeDropdown.options.length - 1;
     document.getElementById('shape-dropdown')?.dispatchEvent(new Event('change'));
   }
 
@@ -281,30 +298,27 @@ function main() {
     points.map((point, index) => {
       const option = document.createElement('option');
       option.value = point.x.toString() + "," + point.y.toString();
+      option.value = index.toString();
+      colorValue.textContent = rgbToHex(point.getColor());
+      colorPicker.value = rgbToHex(point.getColor());
       const x = point.x;
       const y = point.y;
       option.text = `Point (${x}, ${y})`; 
-      dropdown.appendChild(option);
+      pointDropdown.appendChild(option);
     })
   }
 
-  document.getElementById('slider-rotation')?.addEventListener('input', function (e) {
-    const angle = (e.target as HTMLInputElement).valueAsNumber;
-    console.log(selectedShapeIndex, angle);
 
-    if (selectedShapeIndex !== null) {
-      const selectedShape = objects[selectedShapeIndex];
-      selectedShape.setRotation(angle);
-      renderCanvas();
-    }
-  });
+  const sideBar = document.getElementById('sidebar') as HTMLDivElement;
+  const sliderX = document.getElementById('slider-x') as HTMLInputElement;
+  const sliderY = document.getElementById('slider-y') as HTMLInputElement;
+  const sliderLength = document.getElementById('slider-length') as HTMLInputElement;
+  const sliderRotation = document.getElementById('slider-rotation') as HTMLInputElement;
+  const colorPicker = document.getElementById('color-picker') as HTMLInputElement;
+  const shapeDropdown = document.getElementById('shape-dropdown') as HTMLSelectElement;
+  const pointDropdown = document.getElementById('point-dropdown') as HTMLSelectElement;
 
-  const sideBar = document.getElementById('sidebar') as HTMLDivElement
-  const sliderX = document.getElementById('slider-x') as HTMLInputElement
-  const sliderY = document.getElementById('slider-y') as HTMLInputElement
-  const sliderLength = document.getElementById('slider-length') as HTMLInputElement
-  const sliderRotation = document.getElementById('slider-rotation') as HTMLInputElement
-  
+  const colorValue = document.getElementById('color-picker-value') as HTMLSpanElement;
   const sliderXValue = document.getElementById('slider-x-value') as HTMLSpanElement;
   const sliderYValue = document.getElementById('slider-y-value') as HTMLSpanElement;
   const sliderLengthValue = document.getElementById('slider-length-value') as HTMLSpanElement;
@@ -312,10 +326,10 @@ function main() {
 
 
   const sliderXPoint = document.getElementById('slider-x-point') as HTMLInputElement;
-  const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement; 
+  const sliderXPointValue = document.getElementById('slider-x-point-value') as HTMLSpanElement;
   const sliderYPoint = document.getElementById('slider-y-point') as HTMLInputElement;
-  const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement; 
-  
+  const sliderYPointValue = document.getElementById('slider-y-point-value') as HTMLSpanElement;
+
 
 
 
@@ -324,10 +338,10 @@ function main() {
     selectedShapeIndex = parseInt((this as HTMLSelectElement).value, 10);
     updatePointDropdown(selectedShapeIndex);
     sideBar.style.display = 'block';
-    sliderX.value = "0";
-    sliderY.value = "0";
-    sliderLength.value = "0";
-    sliderRotation.value = "0";
+    sliderX.value = '0';
+    sliderY.value = '0';
+    sliderLength.value = '0';
+    sliderRotation.value = '0';
 
     
     sliderXPoint.value = "0";
@@ -347,14 +361,54 @@ function main() {
     sliderYPoint.setAttribute('min', (canvasHeight * -1).toString());
     sliderYPoint.setAttribute('max', canvasHeight.toString());
 
+    sliderLength.setAttribute('min', '1')
+    sliderLength.setAttribute('max', canvasWidth.toString())
+
+    if (objects[selectedShapeIndex].shapeType == ShapeType.SQUARE) {
+      const square = objects[selectedShapeIndex] as Square;
+      sliderLength.value = square.length.toString()
+      sliderLengthValue.textContent = square.length.toString()
+    }
+    else if (objects[selectedShapeIndex].shapeType == ShapeType.LINE) {
+      const line = objects[selectedShapeIndex] as Line;
+      sliderLength.value = line.length.toString()
+      sliderLengthValue.textContent = line.length.toString()
+    }
+    else {
+      sliderLengthValue.textContent = '0';
+    }
+
     // Update slider value displays
     sliderXValue.textContent = '0';
     sliderYValue.textContent = '0';
     sliderXPointValue.textContent = '0';
     sliderYPointValue.textContent = '0';
 
-    sliderLengthValue.textContent = '0';
     sliderRotationValue.textContent = '0';
+
+  });
+
+  // Event listener for dropdown selection point
+  document.getElementById('point-dropdown')?.addEventListener('change', function () {
+    selectedPointIndex = parseInt((this as HTMLSelectElement).value, 10);
+    selectedShapeIndex = parseInt((document.getElementById('shape-dropdown') as HTMLSelectElement).value, 10)
+    console.log('hai', selectedPointIndex);
+    const color = rgbToHex(objects[selectedShapeIndex].getPoints()[selectedPointIndex].getColor());
+    colorPicker.value = color;
+    colorValue.textContent = color;
+    
+  });
+
+  colorPicker.addEventListener('change', function (e) {
+    selectedPointIndex = parseInt((document.getElementById('point-dropdown') as HTMLSelectElement).value, 10);
+    selectedShapeIndex = parseInt((document.getElementById('shape-dropdown') as HTMLSelectElement).value, 10);
+    const hex = (e.target as HTMLInputElement).value;
+    colorValue.textContent = hex;
+    colorPicker.value = hex;
+    objects[selectedShapeIndex].getPoints()[selectedPointIndex].setColor(hexToRgb(hex));
+    console.log("tes",objects[selectedShapeIndex].getPoints()[selectedPointIndex].getColor());
+    renderCanvas();
+    
   });
 
   // Slider
@@ -364,7 +418,7 @@ function main() {
 
     if (selectedShapeIndex !== null) {
       const selectedShape = objects[selectedShapeIndex];
-      selectedShape.translate(newX,selectedShape.ty)
+      translate(selectedShape, newX, selectedShape.ty);
       renderCanvas();
     }
   });
@@ -373,7 +427,7 @@ function main() {
     const newY = parseFloat((e.target as HTMLInputElement).value);
     if (selectedShapeIndex !== null) {
       const selectedShape = objects[selectedShapeIndex];
-      selectedShape.translate(selectedShape.tx, newY);
+      translate(selectedShape,selectedShape.tx, newY);
       renderCanvas();
     }
   });
@@ -435,17 +489,31 @@ function main() {
     renderCanvas();
   });
 
-
-
-  sliderLength.addEventListener('input', function () {
+  sliderLength.addEventListener('input', function (e) {
     sliderLengthValue.textContent = this.value;
+    const newLength = parseFloat((e.target as HTMLInputElement).value);
+
+    if (selectedShapeIndex !== null) {
+      if (objects[selectedShapeIndex].shapeType == ShapeType.SQUARE) {
+        const square = objects[selectedShapeIndex] as Square;
+        square.updateLength(newLength);
+      }
+      else if (objects[selectedShapeIndex].shapeType == ShapeType.LINE) {
+        const line = objects[selectedShapeIndex] as Line;
+        line.setLength(newLength);
+        scale(line, line.sx, line.sy);
+        renderCanvas();
+      }
+      renderCanvas();
+    }
   });
+
   sliderRotation.addEventListener('input', function (e) {
     sliderRotationValue.textContent = this.value;
     const angle = (e.target as HTMLInputElement).valueAsNumber;
     if (selectedShapeIndex !== null) {
       const selectedShape = objects[selectedShapeIndex];
-      selectedShape.setRotation(angle);
+      rotate(selectedShape, angle);
       renderCanvas();
     }
   });
@@ -470,9 +538,6 @@ function main() {
       alert('Only polygon point can be deleted!');
     }
   });
-
-
-
 
 }
 

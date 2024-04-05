@@ -10,8 +10,8 @@
 
 <body>
     <div id="app" class="h-screen w-screen flex">
-        <button id="stop-drawing-btn" class="absolute px-2 py-1 rounded-lg border-2 end-0 top-0 hidden">Stop drawing</button>
-        <div class="flex flex-col h-full bg-blue-950 w-[300px] p-4 gap-4 text-white">
+        <button id="stop-drawing-btn" class="absolute px-2 py-1 rounded-lg border-2 end-0 top-0 hidden bg-red-500 text-white">Stop drawing</button>
+        <div class="flex flex-col h-full bg-blue-950 w-[300px] p-4 gap-4 text-white overflow-y-scroll">
             <h1 class="text-2xl font-bold text-white">GealGeol Drawer</h1>
             <div class="grid grid-cols-2 text-white font-medium gap-2">
                 <button id="line-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Line</button>
@@ -32,7 +32,7 @@
                 <label for="slider-rotation">Rotation: <span id="slider-rotation-value">0</span>°</label>
                 <input id="slider-rotation" type="range" min="0" max="360" step="1" value="0" />
 
-                <label for="color-picker">Color:</label>
+                <label for="color-picker">Color:</label><span id="color-picker-value">RGB(0,0,0)</span>
                 <input id="color-picker" type="color" />
 
                 <label for="shape-dropdown">Shape:</label>
@@ -40,7 +40,6 @@
 
                 <label for="point-dropdown">Point:</label>
                 <select id="point-dropdown" class="text-black"></select>
-
 
                 <label for="slider-x-point">Single point translation X: <span id="slider-x-point-value">0</span></label>
                 <input id="slider-x-point" type="range" min="0" max="canvas.width" step="1" value="0" />
@@ -52,6 +51,8 @@
                     <button id="spt-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">SPT</button>
                     <button id="delete-point-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Delete Point</button>
                 </div>
+            </div>
+            <div class="flex flex-col gap-2">
                 <button id="save-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Save</button>
                 <input type="file" id="file-input" accept=".json" />
                 <button id="load-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Load</button>

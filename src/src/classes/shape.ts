@@ -1,9 +1,10 @@
 import { Point } from './point.ts';
 import { bindBuffer } from '../utils/web-gl.ts';
 import { ShapeType } from '../enum/shape-type.ts';
-import { Transformation } from '../operations/transform.ts';
 import { mat3, vec2 } from 'gl-matrix';
 import { Wrapper } from '../utils/wrapper.ts';
+import { Matrix } from './matrix.ts';
+import { Vector } from './vector.ts';
 
 export abstract class Shape {
   public id: number;
@@ -14,8 +15,6 @@ export abstract class Shape {
   public degree: number;
   public sx: number;
   public sy: number;
-
-  private transformation: Transformation = new Transformation();
 
   protected constructor(id: number, shapeType: ShapeType) {
     this.id = id;
@@ -32,6 +31,10 @@ export abstract class Shape {
     let bufferPositions: number[] = [];
     this.positions.forEach((pos: Point) => bufferPositions.push(...pos.getCoordinate()));
     return new Float32Array(bufferPositions);
+  }
+
+  public getPoints() {
+    return this.positions;
   }
 
   public getColors() {
@@ -59,61 +62,14 @@ export abstract class Shape {
   }
 
   public applyTransformation() {
-    const matrix = this.transformation.getMatrix();
+    const matrix = Matrix.create();
     for (let i = 0; i < this.positions.length; i++) {
       const pos = this.positions[i].getCoordinate();
-      const transformedPos = vec2.transformMat3(vec2.create(), vec2.fromValues(pos[0], pos[1]), matrix);
+      const vec = Vector.fromValues(pos[0], pos[1]);
+      const transformedPos = vec.transformMat(matrix.data).toArray();
       this.positions[i].setCoordinate([transformedPos[0], transformedPos[1]]);
     }
   }
-
-  public rotate(angle: number) {
-    const centroid = this.getCentroid();
-
-    const angleRad = (angle * Math.PI) / 180;
-    const cos = Math.cos(angleRad);
-    const sin = Math.sin(angleRad);
-
-    this.positions = this.positions.map(point => {
-      // Translate points to the origin
-      let x = point.x - centroid.x;
-      let y = point.y - centroid.y;
-
-      // Apply rotation
-      const rotatedX = x * cos - y * sin;
-      const rotatedY = x * sin + y * cos;
-
-      // Translate points back
-      x = rotatedX + centroid.x;
-      y = rotatedY + centroid.y;
-
-      // Return the new point
-      return new Point(x, y, point.getColor());
-    });
-  }
-
-  public setRotation(angle: number) {
-    this.rotate(this.degree-angle);
-    this.degree = angle;
-    this.applyTransformation();
-  }
-
-
-  public translate(newX: number, newY: number) {
-    const dx = newX - this.tx;
-    const dy = newY - this.ty;
-   
-    this.positions = this.positions.map(point => {
-      return new Point(
-        point.x + dx,
-        point.y + dy,
-        point.getColor()
-      );
-    });
-    this.tx = newX;
-    this.ty = newY;
-  }
-
   public getPointRef(x: number, y: number) {
     return this.positions.find(point => point.x === x && point.y === y);
   }
