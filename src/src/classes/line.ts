@@ -4,11 +4,13 @@ import { ShapeType } from '../enum/shape-type.ts';
 
 export class Line extends Shape {
   public length: number;
+  public currLength: number; //for scaling
 
   public constructor(id: number, point: Point) {
     super(id, ShapeType.LINE);
     this.positions = [...this.positions, point];
     this.length = 0;
+    this.currLength = 0;
   }
 
   public getPrimitiveType(gl: WebGLRenderingContext): number {
@@ -23,6 +25,7 @@ export class Line extends Shape {
       this.positions[1].y = point.y;
     }
     this.length = this.positions[0].calculateEuclideanDist(point);
+    this.currLength= this.length;
   }
 
   public updateLength(newLength: number) {
@@ -34,4 +37,9 @@ export class Line extends Shape {
     this.length = newLength;
   }
 
+  public setLength(dLength: number) {
+    this.sx = (dLength + this.length)/this.currLength;
+    this.sy = (dLength + this.length)/this.currLength;
+    this.currLength = dLength + this.length;
+  }
 }

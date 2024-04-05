@@ -11,7 +11,7 @@ import { Polygon } from './classes/polygon.ts';
 import { Square } from './classes/square.ts';
 import { loadFile } from './utils/save-load.ts';
 import { hexToRgb, rgbToHex } from './utils/tools.ts';
-import { rotate, translate } from './utils/transformations.ts';
+import { rotate, scale, translate } from './utils/transformations.ts';
 
 function main() {
   // Create WebGL program
@@ -186,8 +186,9 @@ function main() {
         } else {
           const line = objects[objects.length - 1] as Line;
           line.setEndPoint(point);
-          sliderLength.value = line.length.toString();
-          sliderLengthValue.textContent = line.length.toString()
+          console.log(line.length)
+          sliderLength.value = "0";
+          sliderLengthValue.textContent = "0"
           updatePointDropdown(line.id);
           line.render(gl, bufferPos, bufferCol);
           renderCanvas();
@@ -450,7 +451,6 @@ function main() {
 
   sliderLength.addEventListener('input', function (e) {
     sliderLengthValue.textContent = this.value;
-
     const newLength = parseFloat((e.target as HTMLInputElement).value);
 
     if (selectedShapeIndex !== null) {
@@ -460,7 +460,9 @@ function main() {
       }
       else if (objects[selectedShapeIndex].shapeType == ShapeType.LINE) {
         const line = objects[selectedShapeIndex] as Line;
-        line.updateLength(newLength);
+        line.setLength(newLength);
+        scale(line, line.sx, line.sy);
+        renderCanvas();
       }
       renderCanvas();
     }

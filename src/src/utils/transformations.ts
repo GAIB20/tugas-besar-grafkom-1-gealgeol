@@ -44,4 +44,23 @@ function translate(shape: Shape, tx: number, ty: number) {
     shape.ty = ty;
 }
 
-export { rotate, translate };
+function scale(shape: Shape, sx: number, sy: number) {
+    const centroid = shape.getCentroid();
+  
+    shape.positions = shape.positions.map(point => {
+      let x = point.x - centroid.x;
+      let y = point.y - centroid.y;
+  
+      x *= sx;
+      y *= sy;
+      
+      x += centroid.x;
+      y += centroid.y;
+  
+      return new Point(x, y, point.getColor());
+    });
+  
+    shape.applyTransformation();
+  }
+
+export { rotate, translate, scale };
