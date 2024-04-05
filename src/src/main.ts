@@ -493,6 +493,12 @@ function main() {
         } else if (objects[selectedShapeIndex].shapeType == ShapeType.LINE) {
           const line = objects[selectedShapeIndex] as Line;
           line.movePoint(lengthDif, selectedPointIndex)
+        } else if (objects[selectedShapeIndex].shapeType == ShapeType.RECTANGLE) {
+          const rectangle = objects[selectedShapeIndex] as Rectangle;
+          const rate = lengthDif > 0 ? lengthDif : 1
+          rectangle.setLength(rate)
+          rectangle.setWidth(rate)
+          scale(rectangle, rate, rate)
         }
         renderCanvas()
       }
