@@ -10,6 +10,7 @@ import { Rectangle } from './classes/rectangle.ts';
 import { Polygon } from './classes/polygon.ts';
 import { Square } from './classes/square.ts';
 import { loadFile } from './utils/save-load.ts';
+import { Wrapper } from './utils/wrapper.ts';
 
 function main() {
   // Create WebGL program
@@ -275,7 +276,8 @@ function main() {
   function updatePointDropdown(objId: number) {
     const dropdown = document.getElementById('point-dropdown') as HTMLSelectElement;
     while (dropdown.options.length > 0) dropdown.options.remove(0);
-    const points = objects[objId].positions;
+    const object = objects[objId]
+    let points = object.positions;
     points.map((point, index) => {
       const option = document.createElement('option');
       option.value = point.x.toString() + "," + point.y.toString();
@@ -376,25 +378,62 @@ function main() {
     }
   });
 
+  function getSelectedPoint() {
+    const dropdown = document.getElementById('point-dropdown') as HTMLSelectElement;
+    const selectedOption = dropdown.options[dropdown.selectedIndex];
+    const pointStr = selectedOption.value;
+    const numbersArray = pointStr.split(',');
+
+    const x = parseFloat(numbersArray[0].trim());
+    const y = parseFloat(numbersArray[1].trim());      
+    return new Point(x, y);
+  }
+
+  var sptPointRef: Point;
+  var sptPointXOld: number;
+  var sptPointYOld: number;
+  var spt = true;
+  const sptButton = document.getElementById('spt-btn') as HTMLButtonElement
+  sptButton.addEventListener('click', (e) => {
+    sptButton.classList.toggle('bg-white')
+    sptButton.classList.toggle('text-blue-950')
+    const selectedPoint = getSelectedPoint();
+    sptPointXOld = selectedPoint.x
+    sptPointYOld = selectedPoint.y
+    const selectedShape = objects[selectedShapeIndex!!];  
+    sptPointRef = selectedShape.getPointRef(selectedPoint.x, selectedPoint.y)!!;
+
+    // spt = !spt 
+    // sptPointRef = objects[selectedShapeIndex!!].positions 
+  })
+
   sliderXPoint.addEventListener('input', function (e) {
     sliderXPointValue.textContent = this.value;
+    if (!spt) return 
+    if (selectedShapeIndex == null) return 
     const xDif = parseFloat((e.target as HTMLInputElement).value);
+    const selectedShape = objects[selectedShapeIndex!!];  
+    let pointWrapper = new Wrapper(sptPointRef)
+    
+    selectedShape.singlePointTranslate(pointWrapper, sptPointXOld + xDif, sptPointYOld)
 
-    if (selectedShapeIndex !== null) {
-      const selectedShape = objects[selectedShapeIndex];
-      // selectedShape.translate(newX,selectedShape.ty)
-      renderCanvas();
-    }
+    renderCanvas();
   }); 
+
   sliderYPoint.addEventListener('input', function (e) {
     sliderYPointValue.textContent = this.value;
+    if (!spt) return 
+    if (selectedShapeIndex == null) return 
     const yDif = parseFloat((e.target as HTMLInputElement).value);
-    if (selectedShapeIndex !== null) {
-      const selectedShape = objects[selectedShapeIndex];
-      // selectedShape.translate(selectedShape.tx, newY);
-      renderCanvas();
-    }
+    const selectedShape = objects[selectedShapeIndex!!];  
+    const pointWrapper = new Wrapper(sptPointRef)
+    selectedShape.singlePointTranslate(pointWrapper, sptPointXOld, sptPointYOld + yDif)
+
+    console.log(sptPointRef.x, sptPointRef.y) 
+    renderCanvas();
   });
+
+
 
   sliderLength.addEventListener('input', function () {
     sliderLengthValue.textContent = this.value;
@@ -429,6 +468,8 @@ function main() {
       alert('Only polygon point can be deleted!');
     }
   });
+
+
 
 
 }

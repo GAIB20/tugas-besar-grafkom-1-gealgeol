@@ -49,14 +49,13 @@
                 <input id="slider-y-point" type="range" min="0" max="canvas.height" step="1" value="0" />
 
                 <div class="grid grid-cols-2 text-white font-medium gap-2">
-                    <button id="save-point-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Save SPT</button>
+                    <button id="spt-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">SPT</button>
                     <button id="delete-point-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Delete Point</button>
                 </div>
-                
+                <button id="save-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Save</button>
+                <input type="file" id="file-input" accept=".json" />
+                <button id="load-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Load</button>
             </div>
-            <button id="save-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Save</button>
-            <input type="file" id="file-input" accept=".json" />
-            <button id="load-btn" class="px-2 py-1 rounded-lg border-2 border-white w-full">Load</button>
         </div>
         <div>
             <canvas id="webgl-canvas" class="w-full h-full"></canvas>

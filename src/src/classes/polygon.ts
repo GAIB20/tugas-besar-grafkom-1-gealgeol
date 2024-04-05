@@ -1,5 +1,6 @@
 import { ShapeType } from "../enum/shape-type";
 import { convexHull } from "../utils/algorithms";
+import { Wrapper } from "../utils/wrapper";
 import { Point } from "./point";
 import { Shape } from "./shape";
 
@@ -26,6 +27,14 @@ export class Polygon extends Shape {
             return
         }
         this.references = this.references.filter((p) => !(p.x === point.x && p.y === point.y))
+        this.arrangePositions()
+    }
+
+    public singlePointTranslate(oldPoint: Wrapper, x: number, y: number): void {
+        const oldPointObj = oldPoint.obj as Point
+        const point = this.references.find(point => point === oldPointObj)!!
+        point.x = x 
+        point.y = y
         this.arrangePositions()
     }
 }

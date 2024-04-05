@@ -3,6 +3,7 @@ import { bindBuffer } from '../utils/web-gl.ts';
 import { ShapeType } from '../enum/shape-type.ts';
 import { Transformation } from '../operations/transform.ts';
 import { mat3, vec2 } from 'gl-matrix';
+import { Wrapper } from '../utils/wrapper.ts';
 
 export abstract class Shape {
   public id: number;
@@ -112,5 +113,11 @@ export abstract class Shape {
     this.tx = newX;
     this.ty = newY;
   }
+
+  public getPointRef(x: number, y: number) {
+    return this.positions.find(point => point.x === x && point.y === y);
+  }
+
+  public abstract singlePointTranslate(oldPoint: Wrapper, x: number, y: number): void;
 }
 
